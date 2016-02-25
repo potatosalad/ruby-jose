@@ -86,6 +86,27 @@ module JOSE
       return from_oct(File.binread(file), modules)
     end
 
+    def self.from_okp(object, modules = {})
+      raise ArgumentError, "object must be an Array of length 2" if not object.is_a?(Array) or object.length != 2
+      kty = modules[:kty] || case object[0]
+      when :Ed25519
+        JOSE::JWK::KTY_OKP_Ed25519
+      when :Ed25519ph
+        JOSE::JWK::KTY_OKP_Ed25519ph
+      when :Ed448
+        JOSE::JWK::KTY_OKP_Ed448
+      when :Ed448ph
+        JOSE::JWK::KTY_OKP_Ed448ph
+      when :X25519
+        JOSE::JWK::KTY_OKP_X25519
+      when :X448
+        JOSE::JWK::KTY_OKP_X448
+      else
+        raise ArgumentError, "unrecognized :okp object"
+      end
+      return JOSE::JWK.new(nil, *kty.from_okp(object))
+    end
+
     # Encode API
 
     def self.to_binary(jwk, key = nil, jwe = nil)
@@ -140,6 +161,14 @@ module JOSE
 
     def to_oct
       return kty.to_oct
+    end
+
+    def self.to_okp(jwk)
+      return from(jwk).to_okp
+    end
+
+    def to_okp
+      return kty.to_okp
     end
 
     def self.to_pem(jwk, password = nil)
@@ -254,6 +283,23 @@ module JOSE
           return JOSE::JWK.new(nil, *JOSE::JWK::KTY_EC.generate_key(params))
         when :oct
           return JOSE::JWK.new(nil, *JOSE::JWK::KTY_oct.generate_key(params))
+        when :okp
+          case params[1]
+          when :Ed25519
+            return JOSE::JWK.new(nil, *JOSE::JWK::KTY_OKP_Ed25519.generate_key(params))
+          when :Ed25519ph
+            return JOSE::JWK.new(nil, *JOSE::JWK::KTY_OKP_Ed25519ph.generate_key(params))
+          when :Ed448
+            return JOSE::JWK.new(nil, *JOSE::JWK::KTY_OKP_Ed448.generate_key(params))
+          when :Ed448ph
+            return JOSE::JWK.new(nil, *JOSE::JWK::KTY_OKP_Ed448ph.generate_key(params))
+          when :X25519
+            return JOSE::JWK.new(nil, *JOSE::JWK::KTY_OKP_X25519.generate_key(params))
+          when :X448
+            return JOSE::JWK.new(nil, *JOSE::JWK::KTY_OKP_X448.generate_key(params))
+          else
+            raise ArgumentError, "invalid :okp key generation params"
+          end
         when :rsa
           return JOSE::JWK.new(nil, *JOSE::JWK::KTY_RSA.generate_key(params))
         else
@@ -270,6 +316,17 @@ module JOSE
 
     def generate_key
       return JOSE::JWK.new(nil, *kty.generate_key(fields))
+    end
+
+    def self.shared_secret(your_jwk, my_jwk)
+      return from(your_jwk).shared_secret(from(my_jwk))
+    end
+
+    def shared_secret(other_jwk)
+      other_jwk = from(other_jwk) if not other_jwk.is_a?(JOSE::JWK)
+      raise ArgumentError, "key types must match" if other_jwk.kty.class != kty.class
+      raise ArgumentError, "key type does not support shared secret computations" if not kty.respond_to?(:derive_key)
+      return kty.derive_key(other_jwk)
     end
 
     def self.sign(jwk, plain_text, jws = nil, header = nil)
@@ -325,6 +382,23 @@ module JOSE
           JOSE::JWK::KTY_EC
         when 'oct'
           JOSE::JWK::KTY_oct
+        when 'OKP'
+          case jwk.fields['crv']
+          when 'Ed25519'
+            JOSE::JWK::KTY_OKP_Ed25519
+          when 'Ed25519ph'
+            JOSE::JWK::KTY_OKP_Ed25519ph
+          when 'Ed448'
+            JOSE::JWK::KTY_OKP_Ed448
+          when 'Ed448ph'
+            JOSE::JWK::KTY_OKP_Ed448ph
+          when 'X25519'
+            JOSE::JWK::KTY_OKP_X25519
+          when 'X448'
+            JOSE::JWK::KTY_OKP_X448
+          else
+            raise ArgumentError, "unknown 'crv' for 'kty' of 'OKP': #{jwk.fields['crv'].inspect}"
+          end
         when 'RSA'
           JOSE::JWK::KTY_RSA
         else

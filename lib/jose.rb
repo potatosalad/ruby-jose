@@ -16,7 +16,7 @@ module JOSE
 
   MUTEX = Mutex.new
 
-  @__crypto_fallback__ = false
+  @__crypto_fallback__ = ENV['JOSE_CRYPTO_FALLBACK'] ? true : false
 
   def __crypto_fallback__
     return @__crypto_fallback__

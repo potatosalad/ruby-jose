@@ -18,7 +18,7 @@ module JOSE::JWA::Curve25519_Ruby
   end
 
   def ed25519_verify(sig, m, pk)
-    return JOSE::JWA::Ed25519.verify(sig, m, sk)
+    return JOSE::JWA::Ed25519.verify(sig, m, pk)
   end
 
   def ed25519ph_keypair(secret = nil)
@@ -34,7 +34,7 @@ module JOSE::JWA::Curve25519_Ruby
   end
 
   def ed25519ph_verify(sig, m, pk)
-    return JOSE::JWA::Ed25519.verify_ph(sig, m, sk)
+    return JOSE::JWA::Ed25519.verify_ph(sig, m, pk)
   end
 
   def x25519_keypair(secret = nil)

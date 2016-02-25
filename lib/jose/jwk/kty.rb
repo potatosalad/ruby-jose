@@ -31,4 +31,10 @@ end
 
 require 'jose/jwk/kty_ec'
 require 'jose/jwk/kty_oct'
+require 'jose/jwk/kty_okp_ed25519'
+require 'jose/jwk/kty_okp_ed25519ph'
+require 'jose/jwk/kty_okp_ed448'
+require 'jose/jwk/kty_okp_ed448ph'
+require 'jose/jwk/kty_okp_x25519'
+require 'jose/jwk/kty_okp_x448'
 require 'jose/jwk/kty_rsa'

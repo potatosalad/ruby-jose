@@ -601,7 +601,7 @@ class CFRGCurvesTest < Minitest::Test
           "2f00") # SIGNATURE
       ]
     ]
-    vectors.each_with_index do |vector, index|
+    vectors.each do |vector|
       secret, pk, m, ctx, sig = vector
       if sig.nil?
         sig = ctx
@@ -610,7 +610,7 @@ class CFRGCurvesTest < Minitest::Test
       _pk, sk = JOSE::JWA::Ed448.keypair(secret)
       assert_equal pk, _pk
       _sig = JOSE::JWA::Ed448.sign_ph(m, sk, ctx)
-      assert_equal sig, _sig, "#{index}"
+      assert_equal sig, _sig
       assert JOSE::JWA::Ed448.verify_ph(sig, m, pk, ctx)
     end
   end

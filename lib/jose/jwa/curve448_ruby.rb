@@ -18,7 +18,7 @@ module JOSE::JWA::Curve448_Ruby
   end
 
   def ed448_verify(sig, m, pk)
-    return JOSE::JWA::Ed448.verify(sig, m, sk)
+    return JOSE::JWA::Ed448.verify(sig, m, pk)
   end
 
   def ed448ph_keypair(secret = nil)
@@ -34,7 +34,7 @@ module JOSE::JWA::Curve448_Ruby
   end
 
   def ed448ph_verify(sig, m, pk)
-    return JOSE::JWA::Ed448.verify_ph(sig, m, sk)
+    return JOSE::JWA::Ed448.verify_ph(sig, m, pk)
   end
 
   def x448_keypair(secret = nil)

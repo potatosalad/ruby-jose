@@ -192,6 +192,8 @@ module JOSE
 
   private
 
+    EDDSA_ALG_LIST = ['Ed25519'.freeze, 'Ed25519ph'.freeze, 'Ed448'.freeze, 'Ed448ph'.freeze].freeze
+
     def self.from_fields(jws, modules)
       if jws.fields.has_key?('b64')
         jws.b64 = jws.fields['b64']
@@ -207,6 +209,8 @@ module JOSE
           JOSE::JWS::ALG_RSA_PSS
         when jws.fields['alg'].start_with?('RS')
           JOSE::JWS::ALG_RSA_PKCS1_V1_5
+        when EDDSA_ALG_LIST.include?(jws.fields['alg'])
+          JOSE::JWS::ALG_EDDSA
         when jws.fields['alg'] == 'none'
           JOSE::JWS::ALG_none
         else
