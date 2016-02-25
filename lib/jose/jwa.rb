@@ -33,10 +33,12 @@ module JOSE
 end
 
 require 'jose/jwa/field_element'
+require 'jose/jwa/edwards_point'
+require 'jose/jwa/sha3'
 
 require 'jose/jwa/aes_kw'
 require 'jose/jwa/concat_kdf'
+require 'jose/jwa/curve25519'
+require 'jose/jwa/curve448'
 require 'jose/jwa/pkcs1'
 require 'jose/jwa/pkcs7'
-require 'jose/jwa/x25519'
-require 'jose/jwa/x448'

@@ -107,7 +107,6 @@ module JOSE::JWA::X448
     return x448_base(sk)
   end
 
-private
   def coerce_coordinate_bn!(coordinate)
     raise ArgumentError, "coordinate size must be #{C_coordinatebytes} bytes" if not valid_coordinate?(coordinate)
     coordinate = coordinate.value if coordinate.is_a?(JOSE::JWA::FieldElement)

@@ -6,6 +6,7 @@ class JOSE::JWA::FieldElement
   def initialize(x, p)
     @p = p.to_bn
     @x = x.to_bn % @p
+    @x = (@x.to_i % @p).to_bn if @x < 0
   end
 
   def <=>(y)
@@ -116,7 +117,8 @@ class JOSE::JWA::FieldElement
   def from_bytes(x, b)
     x = x.pack(JOSE::JWA::UCHAR_PACK) if x.is_a?(Array)
     rv = OpenSSL::BN.new(x.reverse, 2)# % (2**(b-1))
-    raise ArgumentError, "x is larger than or equal to p" if rv >= @p
+
+    raise ArgumentError, "x is larger than or equal to p (#{rv})" if rv >= @p
     return make(rv)
   end
 

@@ -4,20 +4,47 @@ require 'base64'
 require 'hamster/hash'
 require 'json'
 require 'openssl'
+require 'thread'
 
 module JOSE
   class Map < Hamster::Hash; end
 end
 
-require 'jose/jwa'
-require 'jose/jwe'
-require 'jose/jwk'
-require 'jose/jws'
-require 'jose/jwt'
-
 module JOSE
 
   extend self
+
+  MUTEX = Mutex.new
+
+  @__crypto_fallback__ = false
+
+  def __crypto_fallback__
+    return @__crypto_fallback__
+  end
+
+  def __crypto_fallback__=(boolean)
+    boolean = !!boolean
+    MUTEX.synchronize {
+      @__crypto_fallback__ = boolean
+      __config_change__
+    }
+  end
+
+  def __curve25519_module__
+    return JOSE::JWA::Curve25519.__implementation__
+  end
+
+  def __curve25519_module__=(m)
+    JOSE::JWA::Curve25519.__implementation__ = m
+  end
+
+  def __curve448_module__
+    return JOSE::JWA::Curve448.__implementation__
+  end
+
+  def __curve448_module__=(m)
+    JOSE::JWA::Curve448.__implementation__ = m
+  end
 
   def decode(binary)
     return JSON.load(binary)
@@ -43,6 +70,11 @@ module JOSE
 
 private
 
+  def __config_change__
+    JOSE::JWA::Curve25519.__config_change__
+    JOSE::JWA::Curve448.__config_change__
+  end
+
   def sort_maps(term)
     case term
     when Hash, JOSE::Map
@@ -59,3 +91,9 @@ private
   end
 
 end
+
+require 'jose/jwa'
+require 'jose/jwe'
+require 'jose/jwk'
+require 'jose/jws'
+require 'jose/jwt'
