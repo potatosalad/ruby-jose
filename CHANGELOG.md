@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 (2016-05-05)
+
+* Fixes
+  * Fix bug with PBES2 based encryption.
+
 ## 0.3.0 (2016-05-05)
 
 * Enhancements

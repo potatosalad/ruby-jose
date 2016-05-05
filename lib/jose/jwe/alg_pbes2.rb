@@ -43,7 +43,7 @@ class JOSE::JWE::ALG_PBES2 < Struct.new(:hmac, :bits, :salt, :iter)
     if salt.nil?
       return fields.put('alg', alg).put('p2c', p2c)
     else
-      p2s = JOSE.urlsafe_encode64(unwrap_salt(alg, salt))
+      p2s = JOSE.urlsafe_encode64(unwrap_salt(salt))
       return fields.put('alg', alg).put('p2c', p2c).put('p2s', p2s)
     end
   end
@@ -56,7 +56,7 @@ class JOSE::JWE::ALG_PBES2 < Struct.new(:hmac, :bits, :salt, :iter)
       'p2c' => iter
     }
     if not salt.nil?
-      extra_fields['p2s'] = JOSE.urlsafe_encode64(unwrap_salt(alg, salt))
+      extra_fields['p2s'] = JOSE.urlsafe_encode64(unwrap_salt(salt))
     end
     return JOSE::JWE::ALG.generate_key([:oct, 16], alg, enc.algorithm).merge(extra_fields)
   end
