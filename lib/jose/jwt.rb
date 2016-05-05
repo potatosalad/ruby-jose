@@ -80,7 +80,7 @@ module JOSE
       plain_text = to_binary
       if jwe.nil?
         jwk = JOSE::JWK.from(jwk)
-        jwe = jwk.kty.block_encryptor(jwk.fields, plain_text)
+        jwe = jwk.block_encryptor
       end
       if jwe.is_a?(Hash)
         jwe = JOSE::Map.new(jwe)
@@ -89,6 +89,24 @@ module JOSE
         jwe = jwe.put('typ', 'JWT')
       end
       return JOSE::JWK.block_encrypt(jwk, plain_text, jwe)
+    end
+
+    def self.merge(left, right)
+      return from(left).merge(right)
+    end
+
+    def merge(object)
+      object = case object
+      when JOSE::Map, Hash
+        object
+      when String
+        JOSE.decode(object)
+      when JOSE::JWT
+        object.to_map
+      else
+        raise ArgumentError, "'object' must be a Hash, String, or JOSE::JWT"
+      end
+      return JOSE::JWT.from_map(self.to_map.merge(object))
     end
 
     def self.peek_payload(signed)
@@ -107,7 +125,7 @@ module JOSE
       plain_text = to_binary
       if jws.nil?
         jwk = JOSE::JWK.from(jwk)
-        jws = jwk.kty.signer(jwk.fields, plain_text)
+        jws = jwk.signer
       end
       if jws.is_a?(Hash)
         jws = JOSE::Map.new(jws)

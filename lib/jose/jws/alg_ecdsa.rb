@@ -30,6 +30,19 @@ class JOSE::JWS::ALG_ECDSA < Struct.new(:digest)
 
   # JOSE::JWS::ALG callbacks
 
+  def generate_key(fields)
+    crv, alg = if digest == OpenSSL::Digest::SHA256
+      ['P-256', 'ES256']
+    elsif digest == OpenSSL::Digest::SHA384
+      ['P-384', 'ES384']
+    elsif digest == OpenSSL::Digest::SHA512
+      ['P-521', 'ES512']
+    else
+      raise ArgumentError, "unhandled ECDSA digest type: #{digest.inspect}"
+    end
+    return JOSE::JWS::ALG.generate_key([:ec, crv], alg)
+  end
+
   def sign(jwk, message)
     return jwk.kty.sign(message, digest)
   end

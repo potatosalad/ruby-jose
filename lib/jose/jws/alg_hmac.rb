@@ -30,6 +30,19 @@ class JOSE::JWS::ALG_HMAC < Struct.new(:hmac)
 
   # JOSE::JWS::ALG callbacks
 
+  def generate_key(fields)
+    bytesize, alg = if hmac == OpenSSL::Digest::SHA256
+      [32, 'HS256']
+    elsif hmac == OpenSSL::Digest::SHA384
+      [48, 'HS384']
+    elsif hmac == OpenSSL::Digest::SHA512
+      [64, 'HS512']
+    else
+      raise ArgumentError, "unhandled HMAC digest type: #{hmac.inspect}"
+    end
+    return JOSE::JWS::ALG.generate_key([:oct, bytesize], alg)
+  end
+
   def sign(jwk, message)
     return jwk.kty.sign(message, hmac)
   end

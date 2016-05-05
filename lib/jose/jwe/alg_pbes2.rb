@@ -19,13 +19,17 @@ class JOSE::JWE::ALG_PBES2 < Struct.new(:hmac, :bits, :salt, :iter)
       raise ArgumentError, "invalid 'alg' for JWE: #{fields['alg'].inspect}"
     end
     iter = nil
-    if fields['p2c'].is_a?(Integer) and fields['p2c'] >= 0
+    if not fields.has_key?('p2c')
+      iter = 1000
+    elsif fields['p2c'].is_a?(Integer) and fields['p2c'] >= 0
       iter = fields['p2c']
     else
       raise ArgumentError, "invalid 'p2c' for JWE: #{fields['p2c'].inspect}"
     end
     salt = nil
-    if fields.has_key?('p2s') and fields['p2s'].is_a?(String)
+    if not fields.has_key?('p2s')
+      salt = nil
+    elsif fields['p2s'].is_a?(String)
       salt = wrap_salt(fields['alg'], JOSE.urlsafe_decode64(fields['p2s']))
     else
       raise ArgumentError, "invalid 'p2s' for JWE: #{fields['p2s'].inspect}"
@@ -34,21 +38,28 @@ class JOSE::JWE::ALG_PBES2 < Struct.new(:hmac, :bits, :salt, :iter)
   end
 
   def to_map(fields)
-    alg = if hmac == OpenSSL::Digest::SHA256
-      'PBES2-HS256+A128KW'
-    elsif hmac == OpenSSL::Digest::SHA384
-      'PBES2-HS384+A192KW'
-    elsif hmac == OpenSSL::Digest::SHA512
-      'PBES2-HS512+A256KW'
-    else
-      raise ArgumentError, "unhandled JOSE::JWE::ALG_PBES2 hmac: #{hmac.inspect}"
-    end
+    alg = algorithm
     p2c = iter
-    p2s = JOSE.urlsafe_encode64(unwrap_salt(alg, salt))
-    return fields.put('alg', alg).put('p2c', p2c).put('p2s', p2s)
+    if salt.nil?
+      return fields.put('alg', alg).put('p2c', p2c)
+    else
+      p2s = JOSE.urlsafe_encode64(unwrap_salt(alg, salt))
+      return fields.put('alg', alg).put('p2c', p2c).put('p2s', p2s)
+    end
   end
 
   # JOSE::JWE::ALG callbacks
+
+  def generate_key(fields, enc)
+    alg = algorithm
+    extra_fields = {
+      'p2c' => iter
+    }
+    if not salt.nil?
+      extra_fields['p2s'] = JOSE.urlsafe_encode64(unwrap_salt(alg, salt))
+    end
+    return JOSE::JWE::ALG.generate_key([:oct, 16], alg, enc.algorithm).merge(extra_fields)
+  end
 
   def key_decrypt(key, enc, encrypted_key)
     if key.is_a?(JOSE::JWK)
@@ -63,18 +74,34 @@ class JOSE::JWE::ALG_PBES2 < Struct.new(:hmac, :bits, :salt, :iter)
     if key.is_a?(JOSE::JWK)
       key = key.kty.derive_key
     end
-    derived_key = OpenSSL::PKCS5.pbkdf2_hmac(key, salt, iter, bits.div(8) + (bits % 8), hmac.new)
+    new_alg = self
+    if new_alg.salt.nil?
+      new_alg = JOSE::JWE::ALG_PBES2.new(hmac, bits, wrap_salt(SecureRandom.random_bytes(8)), iter)
+    end
+    derived_key = OpenSSL::PKCS5.pbkdf2_hmac(key, new_alg.salt, new_alg.iter, new_alg.bits.div(8) + (new_alg.bits % 8), new_alg.hmac.new)
     encrypted_key = JOSE::JWA::AES_KW.wrap(decrypted_key, derived_key)
-    return encrypted_key, self
+    return encrypted_key, new_alg
   end
 
   def next_cek(key, enc)
     return enc.next_cek
   end
 
-private
+  # API functions
 
-  def unwrap_salt(algorithm, salt)
+  def algorithm
+    if hmac == OpenSSL::Digest::SHA256
+      'PBES2-HS256+A128KW'
+    elsif hmac == OpenSSL::Digest::SHA384
+      'PBES2-HS384+A192KW'
+    elsif hmac == OpenSSL::Digest::SHA512
+      'PBES2-HS512+A256KW'
+    else
+      raise ArgumentError, "unhandled JOSE::JWE::ALG_PBES2 hmac: #{hmac.inspect}"
+    end
+  end
+
+  def self.unwrap_salt(algorithm, salt)
     salt_s = StringIO.new(salt)
     if salt_s.read(algorithm.length) != algorithm or salt_s.getbyte != 0
       raise ArgumentError, "unrecognized salt value"
@@ -83,8 +110,16 @@ private
     end
   end
 
+  def unwrap_salt(salt)
+    return JOSE::JWE::ALG_PBES2.unwrap_salt(algorithm, salt)
+  end
+
   def self.wrap_salt(algorithm, salt_input)
     return [algorithm, 0x00, salt_input].pack('a*Ca*')
+  end
+
+  def wrap_salt(salt_input)
+    return JOSE::JWE::ALG_PBES2.wrap_salt(algorithm, salt_input)
   end
 
 end

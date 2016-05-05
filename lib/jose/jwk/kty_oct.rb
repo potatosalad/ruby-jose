@@ -28,25 +28,39 @@ class JOSE::JWK::KTY_oct < Struct.new(:oct)
 
   # JOSE::JWK::KTY callbacks
 
-  def block_encryptor(fields, plain_text)
-    enc = case (oct.bytesize * 8)
-    when 128
-      'A128GCM'
-    when 192
-      'A192GCM'
-    when 256
-      'A256GCM'
-    when 384
-      'A192CBC-HS384'
-    when 512
-      'A256CBC-HS512'
+  def block_encryptor(fields)
+    if fields and fields['use'] == 'enc' and not fields['alg'].nil? and not fields['enc'].nil?
+      jwe = JOSE::Map[
+        'alg' => fields['alg'],
+        'enc' => fields['enc']
+      ]
+      if not fields['p2c'].nil?
+        jwe = jwe.put('p2c', fields['p2c'])
+      end
+      if not fields['p2s'].nil?
+        jwe = jwe.put('p2s', fields['p2s'])
+      end
+      return jwe
     else
-      raise ArgumentError, "oct of size #{oct.bytesize * 8} has no default block encryptor"
+      enc = case (oct.bytesize * 8)
+      when 128
+        'A128GCM'
+      when 192
+        'A192GCM'
+      when 256
+        'A256GCM'
+      when 384
+        'A192CBC-HS384'
+      when 512
+        'A256CBC-HS512'
+      else
+        raise ArgumentError, "oct of size #{oct.bytesize * 8} has no default block encryptor"
+      end
+      return JOSE::Map[
+        'alg' => 'dir',
+        'enc' => enc
+      ]
     end
-    return JOSE::Map[
-      'alg' => 'dir',
-      'enc' => enc
-    ]
   end
 
   def derive_key
@@ -78,8 +92,20 @@ class JOSE::JWK::KTY_oct < Struct.new(:oct)
     return OpenSSL::HMAC.digest(digest_type.new, oct, message)
   end
 
-  def signer(fields = nil, plain_text = nil)
-    return JOSE::Map['alg' => 'HS256']
+  def signer(fields = nil)
+    if fields and fields['use'] == 'sig' and not fields['alg'].nil?
+      return JOSE::Map['alg' => fields['alg']]
+    else
+      bitsize = (oct.bytesize * 8)
+      alg = if bitsize < 384
+        'HS256'
+      elsif bitsize < 512
+        'HS384'
+      else
+        'HS512'
+      end
+      return JOSE::Map['alg' => alg]
+    end
   end
 
   def verify(message, digest_type, signature)

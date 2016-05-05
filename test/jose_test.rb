@@ -34,6 +34,7 @@ class JOSETest < Minitest::Test
     assert_equal a_1_4_iv_b64, JOSE.urlsafe_encode64(a_1_4_iv)
     # A.1.5
     a_1_5_aad = [101,121,74,104,98,71,99,105,79,105,74,83,85,48,69,116,84,48,70,70,85,67,73,115,73,109,86,117,89,121,73,54,73,107,69,121,78,84,90,72,81,48,48,105,102,81].pack('C*')
+    assert_equal a_1_5_aad, a_1_1_jwe_json_b64
     # A.1.6
     a_1_6_txt_cipher = [229,236,166,241,53,191,115,196,174,43,73,109,39,122,233,96,140,206,120,52,51,237,48,11,190,219,186,80,111,104,50,142,47,167,59,61,181,127,196,21,40,82,242,32,123,143,168,226,73,216,176,144,138,247,106,60,16,205,160,109,64,63,192].pack('C*')
     a_1_6_txt_tag = [92,80,104,49,133,25,161,215,173,101,219,211,136,91,210,145].pack('C*')
@@ -51,5 +52,54 @@ class JOSETest < Minitest::Test
     a_1_7_txt, a_1_7_jwe = JOSE::JWE.block_decrypt(a_1_3_jwk, a_1_7_map)
     assert_equal a_1_txt, a_1_7_txt
     assert_equal a_1_1_jwe, a_1_7_jwe
+  end
+
+  # JSON Web Encryption (JWE)
+  # A.3.  Example JWE Using AES Key Wrap and AES_128_CBC_HMAC_SHA_256
+  # https://tools.ietf.org/html/rfc7516#appendix-A.3
+  def test_jwe_a_3
+    # A.3
+    a_3_txt = [76,105,118,101,32,108,111,110,103,32,97,110,100,32,112,114,111,115,112,101,114,46].pack('C*')
+    # A.3.1
+    a_3_1_jwe_json = "{\"alg\":\"A128KW\",\"enc\":\"A128CBC-HS256\"}"
+    a_3_1_jwe_json_b64 = "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"
+    a_3_1_jwe_map = JOSE.decode(a_3_1_jwe_json)
+    a_3_1_jwe = JOSE::JWE.from_binary(a_3_1_jwe_json)
+    assert_equal a_3_1_jwe_map, a_3_1_jwe.to_map
+    assert_equal a_3_1_jwe_json_b64, JOSE.urlsafe_encode64(a_3_1_jwe.to_binary)
+    # A.3.2
+    a_3_2_cek = [4,211,31,197,84,157,252,254,11,100,157,250,63,170,106,206,107,124,212,45,111,107,9,219,200,177,0,240,143,156,44,207].pack('C*')
+    # A.3.3
+    a_3_3_jwk_json = "{\"kty\":\"oct\",\"k\":\"GawgguFyGrWKav7AX4VKUg\"}"
+    a_3_3_cek_encrypted = [232,160,123,211,183,76,245,132,200,128,123,75,190,216,22,67,201,138,193,186,9,91,122,31,246,90,28,139,57,3,76,124,193,11,98,37,173,61,104,57].pack('C*')
+    a_3_3_cek_encrypted_b64 = "6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ"
+    a_3_3_jwk_map = JOSE.decode(a_3_3_jwk_json)
+    a_3_3_jwk = JOSE::JWK.from_binary(a_3_3_jwk_json)
+    assert_equal a_3_3_jwk_map, a_3_3_jwk.to_map
+    assert_equal a_3_3_cek_encrypted_b64, JOSE.urlsafe_encode64(a_3_3_cek_encrypted)
+    # A.3.4
+    a_3_4_iv = [3,22,60,12,43,67,104,105,108,108,105,99,111,116,104,101].pack('C*')
+    a_3_4_iv_b64 = "AxY8DCtDaGlsbGljb3RoZQ"
+    assert_equal a_3_4_iv_b64, JOSE.urlsafe_encode64(a_3_4_iv)
+    # A.3.5
+    a_3_5_aad = [101,121,74,104,98,71,99,105,79,105,74,66,77,84,73,52,83,49,99,105,76,67,74,108,98,109,77,105,79,105,74,66,77,84,73,52,81,48,74,68,76,85,104,84,77,106,85,50,73,110,48].pack('C*')
+    assert_equal a_3_5_aad, a_3_1_jwe_json_b64
+    # A.3.6
+    a_3_6_txt_cipher = [40,57,83,181,119,33,133,148,198,185,243,24,152,230,6,75,129,223,127,19,210,82,183,230,168,33,215,104,143,112,56,102].pack('C*')
+    a_3_6_txt_tag = [83,73,191,98,104,205,211,128,201,189,199,133,32,38,194,85].pack('C*')
+    a_3_6_txt_cipher_b64 = "KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY"
+    a_3_6_txt_tag_b64 = "U0m_YmjN04DJvceFICbCVQ"
+    assert_equal a_3_6_txt_cipher_b64, JOSE.urlsafe_encode64(a_3_6_txt_cipher)
+    assert_equal a_3_6_txt_tag_b64, JOSE.urlsafe_encode64(a_3_6_txt_tag)
+    # A.3.7
+    a_3_7_jwe_compact = "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ.AxY8DCtDaGlsbGljb3RoZQ.KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY.U0m_YmjN04DJvceFICbCVQ"
+    a_3_7_txt, a_3_7_jwe = JOSE::JWE.block_decrypt(a_3_3_jwk, a_3_7_jwe_compact)
+    assert_equal a_3_txt, a_3_7_txt
+    assert_equal a_3_1_jwe, a_3_7_jwe
+    # Roundtrip test
+    a_3_7_map = JOSE::JWE.block_encrypt(a_3_3_jwk, a_3_txt, a_3_1_jwe, a_3_2_cek, a_3_4_iv)
+    a_3_7_txt, a_3_7_jwe = JOSE::JWE.block_decrypt(a_3_3_jwk, a_3_7_map)
+    assert_equal a_3_txt, a_3_7_txt
+    assert_equal a_3_1_jwe, a_3_7_jwe
   end
 end

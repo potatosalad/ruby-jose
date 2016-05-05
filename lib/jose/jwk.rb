@@ -226,8 +226,16 @@ module JOSE
     end
 
     def block_encrypt(plain_text, jwe = nil)
-      jwe ||= kty.block_encryptor(fields, plain_text)
+      jwe ||= block_encryptor
       return JOSE::JWE.block_encrypt(self, plain_text, jwe)
+    end
+
+    def self.block_encryptor(jwe)
+      return from(jwe).block_encryptor
+    end
+
+    def block_encryptor
+      return kty.block_encryptor(fields)
     end
 
     def self.box_decrypt(jwk, encrypted)
@@ -249,7 +257,7 @@ module JOSE
         my_private_jwk = JOSE::JWK.from(my_private_jwk)
       end
       if jwe.nil?
-        jwe = other_public_jwk.kty.block_encryptor(fields, plain_text)
+        jwe = other_public_jwk.block_encryptor
       end
       if jwe.is_a?(Hash)
         jwe = JOSE::Map.new(jwe)
@@ -318,6 +326,24 @@ module JOSE
       return JOSE::JWK.new(nil, *kty.generate_key(fields))
     end
 
+    def self.merge(left, right)
+      return from(left).merge(right)
+    end
+
+    def merge(object)
+      object = case object
+      when JOSE::Map, Hash
+        object
+      when String
+        JOSE.decode(object)
+      when JOSE::JWK
+        object.to_map
+      else
+        raise ArgumentError, "'object' must be a Hash, String, or JOSE::JWK"
+      end
+      return JOSE::JWK.from_map(self.to_map.merge(object))
+    end
+
     def self.shared_secret(your_jwk, my_jwk)
       return from(your_jwk).shared_secret(from(my_jwk))
     end
@@ -334,8 +360,16 @@ module JOSE
     end
 
     def sign(plain_text, jws = nil, header = nil)
-      jws ||= kty.signer(fields, plain_text)
+      jws ||= signer
       return JOSE::JWS.sign(self, plain_text, jws, header)
+    end
+
+    def self.signer(jwk)
+      return from(jwk).signer
+    end
+
+    def signer
+      return kty.signer(fields)
     end
 
     def self.verify(signed, jwk)

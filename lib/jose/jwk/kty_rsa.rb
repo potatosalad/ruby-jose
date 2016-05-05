@@ -67,11 +67,18 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
 
   # JOSE::JWK::KTY callbacks
 
-  def block_encryptor(fields, plain_text)
-    return JOSE::Map[
-      'alg' => 'RSA-OAEP',
-      'enc' => 'A128GCM'
-    ]
+  def block_encryptor(fields = nil)
+    if fields and fields['use'] == 'enc' and not fields['alg'].nil? and not fields['enc'].nil?
+      return JOSE::Map[
+        'alg' => fields['alg'],
+        'enc' => fields['enc']
+      ]
+    else
+      return JOSE::Map[
+        'alg' => 'RSA-OAEP',
+        'enc' => 'A128GCM'
+      ]
+    end
   end
 
   def decrypt_private(cipher_text, rsa_padding: :rsa_pkcs1_padding, rsa_oaep_md: nil)
@@ -146,8 +153,10 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
     end
   end
 
-  def signer(fields = nil, plain_text = nil)
-    if key.private?
+  def signer(fields = nil)
+    if key.private? and fields and fields['use'] == 'sig' and not fields['alg'].nil?
+      return JOSE::Map['alg' => fields['alg']]
+    elsif key.private?
       return JOSE::Map['alg' => 'RS256']
     else
       raise ArgumentError, "signing not supported for public keys"

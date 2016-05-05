@@ -82,11 +82,28 @@ class JOSE::JWK::KTY_EC < Struct.new(:key)
 
   # JOSE::JWK::KTY callbacks
 
-  def block_encryptor(fields, plain_text)
-    return JOSE::Map[
-      'alg' => 'ECDH-ES',
-      'enc' => 'A128GCM'
-    ]
+  def block_encryptor(fields)
+    if fields and fields['use'] == 'enc' and not fields['alg'].nil? and not fields['enc'].nil?
+      jwe = JOSE::Map[
+        'alg' => fields['alg'],
+        'enc' => fields['enc']
+      ]
+      if not fields['apu'].nil?
+        jwe = jwe.put('apu', fields['apu'])
+      end
+      if not fields['apv'].nil?
+        jwe = jwe.put('apv', fields['apv'])
+      end
+      if not fields['epk'].nil?
+        jwe = jwe.put('epk', fields['epk'])
+      end
+      return jwe
+    else
+      return JOSE::Map[
+        'alg' => 'ECDH-ES',
+        'enc' => 'A128GCM'
+      ]
+    end
   end
 
   def derive_key(my_private_key)
@@ -103,6 +120,16 @@ class JOSE::JWK::KTY_EC < Struct.new(:key)
   def self.generate_key(curve_name)
     if curve_name.is_a?(Array) and curve_name.length == 2 and curve_name[0] == :ec
       curve_name = curve_name[1]
+    end
+    curve_name = case curve_name
+    when 'P-256'
+      'prime256v1'
+    when 'P-384'
+      'secp384r1'
+    when 'P-521'
+      'secp521r1'
+    else
+      curve_name
     end
     if curve_name.is_a?(String)
       return from_key(OpenSSL::PKey::EC.new(curve_name).generate_key)
@@ -131,9 +158,21 @@ class JOSE::JWK::KTY_EC < Struct.new(:key)
     return rpad.concat(spad)
   end
 
-  def signer(fields = nil, plain_text = nil)
-    if key.private_key?
-      return JOSE::Map['alg' => 'ES256']
+  def signer(fields = nil)
+    if key.private_key? and fields and fields['use'] == 'sig' and not fields['alg'].nil?
+      return JOSE::Map['alg' => fields['alg']]
+    elsif key.private_key?
+      alg = case key.group.curve_name
+      when 'prime256v1', 'secp256r1'
+        'ES256'
+      when 'secp384r1'
+        'ES384'
+      when 'secp521r1'
+        'ES512'
+      else
+        raise ArgumentError, "unhandled EC curve name: #{key.group.curve_name.inspect}"
+      end
+      return JOSE::Map['alg' => alg]
     else
       raise ArgumentError, "signing not supported for public keys"
     end

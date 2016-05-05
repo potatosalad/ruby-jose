@@ -2,6 +2,14 @@ module JOSE::JWE::ALG
 
   extend self
 
+  def generate_key(parameters, algorithm, encryption)
+    return JOSE::JWK.generate_key(parameters).merge({
+      'alg' => algorithm,
+      'enc' => encryption,
+      'use' => 'enc'
+    })
+  end
+
 end
 
 require 'jose/jwe/alg_aes_gcm_kw'

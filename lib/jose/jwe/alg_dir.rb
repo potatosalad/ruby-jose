@@ -17,6 +17,10 @@ class JOSE::JWE::ALG_dir
 
   # JOSE::JWE::ALG callbacks
 
+  def generate_key(fields, enc)
+    return JOSE::JWE::ALG.generate_key([:oct, enc.bits.div(8)], 'dir', enc.algorithm)
+  end
+
   def key_decrypt(key, enc, encrypted_key)
     if key.is_a?(String)
       return key

@@ -29,6 +29,7 @@ module JOSE::JWA::Curve448
 
   def __config_change__(lock = true)
     MUTEX.lock if lock
+    @__implementation__ ||= nil
     @__implementation__ = __pick_best_implementation__ if @__implementation__.nil? or @__implementation__.__ruby__? or not @__implementation__.__supported__?
     MUTEX.unlock if lock
   end
@@ -80,11 +81,11 @@ module JOSE::JWA::Curve448
 private
   def __pick_best_implementation__
     implementation = nil
-    implementation = @__implementations__.detect do |implementation|
-      next implementation.__supported__?
+    implementation = @__implementations__.detect do |mod|
+      next mod.__supported__?
     end
-    implementation ||= @__ruby_implementations__.detect do |implementation|
-      next implementation.__supported__?
+    implementation ||= @__ruby_implementations__.detect do |mod|
+      next mod.__supported__?
     end
     implementation ||= JOSE::JWA::Curve448_Unsupported
     return implementation

@@ -24,6 +24,10 @@ class JOSE::JWS::ALG_EDDSA < Struct.new(:sign_type)
 
   # JOSE::JWS::ALG callbacks
 
+  def generate_key(fields)
+    return JOSE::JWS::ALG.generate_key([:okp, sign_type], sign_type.to_s)
+  end
+
   def sign(jwk, message)
     return jwk.kty.sign(message, sign_type)
   end

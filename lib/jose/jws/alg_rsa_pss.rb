@@ -30,6 +30,19 @@ class JOSE::JWS::ALG_RSA_PSS < Struct.new(:digest)
 
   # JOSE::JWS::ALG callbacks
 
+  def generate_key(fields)
+    bitsize, alg = if digest == OpenSSL::Digest::SHA256
+      [2048, 'PS256']
+    elsif digest == OpenSSL::Digest::SHA384
+      [3072, 'PS384']
+    elsif digest == OpenSSL::Digest::SHA512
+      [4096, 'PS512']
+    else
+      raise ArgumentError, "unhandled RSA_PSS digest type: #{digest.inspect}"
+    end
+    return JOSE::JWS::ALG.generate_key([:rsa, bitsize], alg)
+  end
+
   def sign(jwk, message)
     return jwk.kty.sign(message, digest, padding: :rsa_pkcs1_pss_padding)
   end

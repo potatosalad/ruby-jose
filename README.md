@@ -24,7 +24,25 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Better documentation is in progress, but the [erlang-jose documentation](https://hexdocs.pm/jose/) can provide an idea of the functionality available in this gem.
+
+```ruby
+# Let's use our secret key "symmetric key" for use with
+# the HMAC using SHA-256 (HS256) algorithm.
+jwk = JOSE::JWK.from_oct('symmetric key')
+
+# Here is the JSON format of our JWK.
+jwk.to_binary
+# => "{\"k\":\"c3ltbWV0cmljIGtleQ\",\"kty\":\"oct\"}"
+
+# Now let's sign our message using HS256.
+signed = jwk.sign('test', { 'alg' => 'HS256' }).compact
+# => "eyJhbGciOiJIUzI1NiJ9.dGVzdA.VlZz7pJCnos0k-WUL9O9RoT9N--2kHSakNIdOg-MIro"
+
+# We use the same key for verification.
+verified, message, = jwk.verify(signed)
+# => [true, "test"]
+```
 
 ## Development
 
@@ -35,7 +53,6 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/potatosalad/ruby-jose. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
-
 
 ## License
 

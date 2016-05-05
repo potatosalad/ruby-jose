@@ -55,11 +55,28 @@ class JOSE::JWK::KTY_OKP_X25519 < Struct.new(:okp)
 
   # JOSE::JWK::KTY callbacks
 
-  def block_encryptor(fields, plain_text)
-    return JOSE::Map[
-      'alg' => 'ECDH-ES',
-      'enc' => 'A128GCM'
-    ]
+  def block_encryptor(fields)
+    if fields and fields['use'] == 'enc' and not fields['alg'].nil? and not fields['enc'].nil?
+      jwe = JOSE::Map[
+        'alg' => fields['alg'],
+        'enc' => fields['enc']
+      ]
+      if not fields['apu'].nil?
+        jwe = jwe.put('apu', fields['apu'])
+      end
+      if not fields['apv'].nil?
+        jwe = jwe.put('apv', fields['apv'])
+      end
+      if not fields['epk'].nil?
+        jwe = jwe.put('epk', fields['epk'])
+      end
+      return jwe
+    else
+      return JOSE::Map[
+        'alg' => 'ECDH-ES',
+        'enc' => 'A128GCM'
+      ]
+    end
   end
 
   def derive_key(my_sk)

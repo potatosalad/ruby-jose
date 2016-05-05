@@ -47,6 +47,14 @@ class JOSE::JWE::ALG_ECDH_ES < Struct.new(:bits, :epk, :apu, :apv)
 
   # JOSE::JWE::ALG callbacks
 
+  def generate_key(fields, enc)
+    if not epk.nil?
+      return JOSE::JWE::ALG.generate_key(epk, algorithm, enc.algorithm)
+    else
+      return JOSE::JWE::ALG.generate_key([:ec, 'P-521'], algorithm, enc.algorithm)
+    end
+  end
+
   def key_decrypt(box_keys, enc, encrypted_key)
     other_public_key, my_private_key = box_keys
     if my_private_key and epk and epk.to_key != other_public_key.to_key

@@ -17,20 +17,14 @@ class JOSE::JWE::ALG_AES_KW < Struct.new(:bits)
   end
 
   def to_map(fields)
-    alg = case bits
-    when 128
-      'A128KW'
-    when 192
-      'A192KW'
-    when 256
-      'A256KW'
-    else
-      raise ArgumentError, "unhandled JOSE::JWE::ALG_AES_KW bits: #{bits.inspect}"
-    end
-    return fields.put('alg', alg)
+    return fields.put('alg', algorithm)
   end
 
   # JOSE::JWE::ALG callbacks
+
+  def generate_key(fields, enc)
+    return JOSE::JWE::ALG.generate_key([:oct, bits.div(8)], algorithm, enc.algorithm)
+  end
 
   def key_decrypt(key, enc, encrypted_key)
     if key.is_a?(JOSE::JWK)
@@ -52,6 +46,21 @@ class JOSE::JWE::ALG_AES_KW < Struct.new(:bits)
 
   def next_cek(key, enc)
     return enc.next_cek
+  end
+
+  # API functions
+
+  def algorithm
+    case bits
+    when 128
+      'A128KW'
+    when 192
+      'A192KW'
+    when 256
+      'A256KW'
+    else
+      raise ArgumentError, "unhandled JOSE::JWE::ALG_AES_KW bits: #{bits.inspect}"
+    end
   end
 
 end

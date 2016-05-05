@@ -40,6 +40,7 @@ class JOSE::JWE::ENC_AES_GCM < Struct.new(:cipher_name, :bits, :cek_len, :iv_len
     cipher.decrypt
     cipher.key = cek
     cipher.iv = iv
+    cipher.padding = 0
     cipher.auth_data = aad
     cipher.auth_tag = cipher_tag
     plain_text = cipher.update(cipher_text) + cipher.final
@@ -52,6 +53,7 @@ class JOSE::JWE::ENC_AES_GCM < Struct.new(:cipher_name, :bits, :cek_len, :iv_len
     cipher.encrypt
     cipher.key = cek
     cipher.iv = iv
+    cipher.padding = 0
     cipher.auth_data = aad
     cipher_text = cipher.update(plain_text) + cipher.final
     return cipher_text, cipher.auth_tag

@@ -30,16 +30,7 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
   end
 
   def to_map(fields)
-    alg = case bits
-    when 128
-      'A128GCMKW'
-    when 192
-      'A192GCMKW'
-    when 256
-      'A256GCMKW'
-    else
-      raise ArgumentError, "unhandled JOSE::JWE::ALG_AES_KW bits: #{bits.inspect}"
-    end
+    alg = algorithm
     fields = fields.put('alg', alg)
     if iv
       fields = fields.put('iv', JOSE.urlsafe_encode64(iv))
@@ -51,6 +42,10 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
   end
 
   # JOSE::JWE::ALG callbacks
+
+  def generate_key(fields, enc)
+    return JOSE::JWE::ALG.generate_key([:oct, bits.div(8)], algorithm, enc.algorithm)
+  end
 
   def key_decrypt(key, enc, encrypted_key)
     if iv.nil? or tag.nil?
@@ -67,6 +62,7 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
     cipher.decrypt
     cipher.key = derived_key
     cipher.iv = iv
+    cipher.padding = 0
     cipher.auth_data = aad
     cipher.auth_tag = cipher_tag
     plain_text = cipher.update(cipher_text) + cipher.final
@@ -85,6 +81,7 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
     cipher.encrypt
     cipher.key = derived_key
     cipher.iv = new_alg.iv
+    cipher.padding = 0
     cipher.auth_data = aad
     cipher_text = cipher.update(plain_text) + cipher.final
     new_alg.tag = cipher.auth_tag
@@ -93,6 +90,21 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
 
   def next_cek(key, enc)
     return enc.next_cek
+  end
+
+  # API functions
+
+  def algorithm
+    case bits
+    when 128
+      'A128GCMKW'
+    when 192
+      'A192GCMKW'
+    when 256
+      'A256GCMKW'
+    else
+      raise ArgumentError, "unhandled JOSE::JWE::ALG_AES_KW bits: #{bits.inspect}"
+    end
   end
 
 end

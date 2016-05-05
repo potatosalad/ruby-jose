@@ -95,8 +95,7 @@ module JOSE
 
     def self.expand(binary)
       if binary.is_a?(String)
-        parts = binary.split('.')
-        if parts.length == 3
+        if binary.count('.') == 2 and (parts = binary.split('.', 3)).length == 3
           protected_binary, payload, signature = parts
           return JOSE::SignedMap[
             'payload'   => payload,
@@ -109,6 +108,32 @@ module JOSE
       else
         raise ArgumentError, "'binary' must be a String"
       end
+    end
+
+    def self.generate_key(object, modules = {})
+      return from(object, modules).generate_key
+    end
+
+    def generate_key
+      return alg.generate_key(fields)
+    end
+
+    def self.merge(left, right)
+      return from(left).merge(right)
+    end
+
+    def merge(object)
+      object = case object
+      when JOSE::Map, Hash
+        object
+      when String
+        JOSE.decode(object)
+      when JOSE::JWS
+        object.to_map
+      else
+        raise ArgumentError, "'object' must be a Hash, String, or JOSE::JWS"
+      end
+      return JOSE::JWS.from_map(self.to_map.merge(object))
     end
 
     def self.peek_payload(signed)
@@ -163,7 +188,6 @@ module JOSE
     end
 
     def verify(key, plain_text, signature, protected_binary = JOSE.urlsafe_encode64(to_binary))
-      payload = JOSE.urlsafe_encode64(plain_text)
       signing_input = signing_input(plain_text, protected_binary)
       return alg.verify(key, signing_input, signature), plain_text, self
     end

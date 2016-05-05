@@ -138,7 +138,7 @@ module JOSE
       else
         aad_b64 = JOSE.urlsafe_encode64(aad)
         concat_aad = [protected_binary, '.', aad_b64].join
-        cipher_text, cipher_tag = enc.block_encrypt([aad_b64, jwe.compress(plain_text)], cek, iv)
+        cipher_text, cipher_tag = enc.block_encrypt([concat_aad, jwe.compress(plain_text)], cek, iv)
         return JOSE::EncryptedMap[
           'aad'           => aad_b64,
           'ciphertext'    => JOSE.urlsafe_encode64(cipher_text),
@@ -199,6 +199,14 @@ module JOSE
       end
     end
 
+    def self.generate_key(object, modules = {})
+      return from(object, modules).generate_key
+    end
+
+    def generate_key
+      return alg.generate_key(fields, enc)
+    end
+
     def key_decrypt(key, encrypted_key)
       return alg.key_decrypt(key, enc, encrypted_key)
     end
@@ -208,6 +216,24 @@ module JOSE
       new_jwe = JOSE::JWE.from_map(to_map)
       new_jwe.alg = new_alg
       return encrypted_key, new_jwe
+    end
+
+    def self.merge(left, right)
+      return from(left).merge(right)
+    end
+
+    def merge(object)
+      object = case object
+      when JOSE::Map, Hash
+        object
+      when String
+        JOSE.decode(object)
+      when JOSE::JWE
+        object.to_map
+      else
+        raise ArgumentError, "'object' must be a Hash, String, or JOSE::JWE"
+      end
+      return JOSE::JWE.from_map(self.to_map.merge(object))
     end
 
     def next_cek(key)

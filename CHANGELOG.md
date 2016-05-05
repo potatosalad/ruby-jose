@@ -1,5 +1,47 @@
 # Changelog
 
+## 0.3.0 (2016-05-05)
+
+* Enhancements
+  * Added merge functions:
+    * `JOSE::JWE#merge`
+    * `JOSE::JWK#merge`
+    * `JOSE::JWS#merge`
+    * `JOSE::JWT#merge`
+  * Added block_encryptor and signer functions:
+    * `JOSE::JWK#block_encryptor`
+    * `JOSE::JWK#signer`
+  * Support for `"alg"`, `"enc"`, and `"use"` on keys.
+
+Examples of new functionality:
+
+```ruby
+# Let's generate a 64 byte octet key
+jwk = JOSE::JWK.generate_key([:oct, 64])
+# => {"k"=>"FXSy7PufOayusvfyKQzdxCegm7yWIMp1b0LD13v57Nq2wF_B-fcr7LDOkufDikmFFsVYWLgrA2zEB--_qqDn3g", "kty"=>"oct"}
+
+# Based on the key's size and type, a default signer (JWS) can be determined
+jwk.signer
+# => {"alg"=>"HS512"}
+
+# Based on the key's size and type, a default encryptor (JWE) can be determined
+jwk.block_encryptor
+# => {"alg"=>"dir", "enc"=>"A256CBC-HS512"}
+
+# Keys can be generated based on the signing algorithm (JWS)
+JOSE::JWS.generate_key({'alg' => 'HS256'})
+# => {"alg"=>"HS256", "k"=>"UuP3Tw2xbGV5N3BGh34cJNzzC2R1zU7i4rOnF9A8nqY", "kty"=>"oct", "use"=>"sig"}
+
+# Keys can be generated based on the encryption algorithm (JWE)
+JOSE::JWE.generate_key({'alg' => 'dir', 'enc' => 'A128GCM'})
+# => {"alg"=>"dir", "enc"=>"A128GCM", "k"=>"8WNdBjXXwg6QTwrrOnvEPw", "kty"=>"oct", "use"=>"enc"}
+
+# Example of merging a map into an existing JWS (also works with JWE, JWK, and JWT)
+jws = JOSE::JWS.from({'alg' => 'HS256'})
+jws.merge({'typ' => 'JWT'})
+# => {"alg"=>"HS256", "typ"=>"JWT"}
+```
+
 ## 0.2.0 (2016-02-25)
 
 * Enhancements

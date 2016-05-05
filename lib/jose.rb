@@ -17,6 +17,7 @@ module JOSE
   MUTEX = Mutex.new
 
   @__crypto_fallback__ = ENV['JOSE_CRYPTO_FALLBACK'] ? true : false
+  @__unsecured_signing__ = ENV['JOSE_UNSECURED_SIGNING'] ? true : false
 
   def __crypto_fallback__
     return @__crypto_fallback__
@@ -52,6 +53,18 @@ module JOSE
 
   def encode(term)
     return JSON.dump(sort_maps(term))
+  end
+
+  def __unsecured_signing__
+    return @__unsecured_signing__
+  end
+
+  def __unsecured_signing__=(boolean)
+    boolean = !!boolean
+    MUTEX.synchronize {
+      @__unsecured_signing__ = boolean
+      __config_change__
+    }
   end
 
   def urlsafe_decode64(binary)

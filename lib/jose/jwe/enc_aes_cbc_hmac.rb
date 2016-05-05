@@ -41,13 +41,14 @@ class JOSE::JWE::ENC_AES_CBC_HMAC < Struct.new(:cipher_name, :bits, :cek_len, :i
     enc_key = cek_s.read(enc_len)
     aad_len = [(aad.bytesize * 8)].pack('Q>')
     mac_data = [aad, iv, cipher_text, aad_len].pack('a*a*a*a*')
-    if cipher_tag != OpenSSL::HMAC.digest(hmac.new, mac_key, mac_data)[0..tag_len]
+    if cipher_tag != OpenSSL::HMAC.digest(hmac.new, mac_key, mac_data)[0...tag_len]
       raise ArgumentError, "decryption error"
     else
       cipher = OpenSSL::Cipher.new(cipher_name)
       cipher.decrypt
-      cipher.key = cek
+      cipher.key = enc_key
       cipher.iv = iv
+      cipher.padding = 0
       plain_text = JOSE::JWA::PKCS7.unpad(cipher.update(cipher_text) + cipher.final)
       return plain_text
     end
@@ -60,12 +61,13 @@ class JOSE::JWE::ENC_AES_CBC_HMAC < Struct.new(:cipher_name, :bits, :cek_len, :i
     enc_key = cek_s.read(enc_len)
     cipher = OpenSSL::Cipher.new(cipher_name)
     cipher.encrypt
-    cipher.key = cek
+    cipher.key = enc_key
     cipher.iv = iv
+    cipher.padding = 0
     cipher_text = cipher.update(JOSE::JWA::PKCS7.pad(plain_text)) + cipher.final
     aad_len = [(aad.bytesize * 8)].pack('Q>')
     mac_data = [aad, iv, cipher_text, aad_len].pack('a*a*a*a*')
-    cipher_tag = OpenSSL::HMAC.digest(hmac.new, mac_key, mac_data)[0..tag_len]
+    cipher_tag = OpenSSL::HMAC.digest(hmac.new, mac_key, mac_data)[0...tag_len]
     return cipher_text, cipher_tag
   end
 

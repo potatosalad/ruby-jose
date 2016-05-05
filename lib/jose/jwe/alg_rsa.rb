@@ -21,24 +21,14 @@ class JOSE::JWE::ALG_RSA < Struct.new(:rsa_padding, :rsa_oaep_md)
   end
 
   def to_map(fields)
-    alg = nil
-    if rsa_padding == :rsa_pkcs1_padding
-      alg = 'RSA1_5'
-    elsif rsa_padding == :rsa_pkcs1_oaep_padding
-      if rsa_oaep_md == OpenSSL::Digest::SHA1
-        alg = 'RSA-OAEP'
-      elsif rsa_oaep_md == OpenSSL::Digest::SHA256
-        alg = 'RSA-OAEP-256'
-      else
-        raise ArgumentError, "unhandled JOSE::JWE::ALG_RSA rsa_oaep_md: #{rsa_oaep_md.inspect}"
-      end
-    else
-      raise ArgumentError, "unhandled JOSE::JWE::ALG_RSA rsa_padding: #{rsa_padding.inspect}"
-    end
-    return fields.put('alg', alg)
+    return fields.put('alg', algorithm)
   end
 
   # JOSE::JWE::ALG callbacks
+
+  def generate_key(fields, enc)
+    return JOSE::JWE::ALG.generate_key([:rsa, 2048], algorithm, enc.algorithm)
+  end
 
   def key_decrypt(key, enc, encrypted_key)
     if key.is_a?(JOSE::JWK)
@@ -58,6 +48,24 @@ class JOSE::JWE::ALG_RSA < Struct.new(:rsa_padding, :rsa_oaep_md)
 
   def next_cek(key, enc)
     return enc.next_cek
+  end
+
+  # API functions
+
+  def algorithm
+    if rsa_padding == :rsa_pkcs1_padding
+      'RSA1_5'
+    elsif rsa_padding == :rsa_pkcs1_oaep_padding
+      if rsa_oaep_md == OpenSSL::Digest::SHA1
+        'RSA-OAEP'
+      elsif rsa_oaep_md == OpenSSL::Digest::SHA256
+        'RSA-OAEP-256'
+      else
+        raise ArgumentError, "unhandled JOSE::JWE::ALG_RSA rsa_oaep_md: #{rsa_oaep_md.inspect}"
+      end
+    else
+      raise ArgumentError, "unhandled JOSE::JWE::ALG_RSA rsa_padding: #{rsa_padding.inspect}"
+    end
   end
 
 end

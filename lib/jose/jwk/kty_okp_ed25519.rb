@@ -84,8 +84,14 @@ class JOSE::JWK::KTY_OKP_Ed25519 < Struct.new(:okp)
     return JOSE::JWA::Curve25519.ed25519_sign(message, okp)
   end
 
-  def signer(fields = nil, plain_text = nil)
-    return JOSE::Map['alg' => 'Ed25519']
+  def signer(fields = nil)
+    if okp.bytesize == SK_BYTES and fields and fields['use'] == 'sig' and not fields['alg'].nil?
+      return JOSE::Map['alg' => fields['alg']]
+    elsif okp.bytesize == SK_BYTES
+      return JOSE::Map['alg' => 'Ed25519']
+    else
+      raise ArgumentError, "signing not supported for public keys"
+    end
   end
 
   def verify(message, digest_type, signature)
