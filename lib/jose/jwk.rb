@@ -107,6 +107,41 @@ module JOSE
       return JOSE::JWK.new(nil, *kty.from_okp(object))
     end
 
+    def self.from_openssh_key(object, modules = {})
+      raise ArgumentError, "object must be a String or Array" if not object.is_a?(String) and not object.is_a?(Array)
+      keys = object
+      if object.is_a?(String)
+        keys = JOSE::JWK::OpenSSHKey.from_binary(object)
+      end
+      ((pk_type, pk), key), = keys[0]
+      sk_type, sk_pk, = key
+      if pk_type and pk and key and sk_type and sk_pk and pk_type == sk_type and pk == sk_pk
+        kty = modules[:kty] || case pk_type
+        when 'ssh-ed25519'
+          JOSE::JWK::KTY_OKP_Ed25519
+        when 'ssh-ed25519ph'
+          JOSE::JWK::KTY_OKP_Ed25519ph
+        when 'ssh-ed448'
+          JOSE::JWK::KTY_OKP_Ed448
+        when 'ssh-ed448ph'
+          JOSE::JWK::KTY_OKP_Ed448ph
+        when 'ssh-x25519'
+          JOSE::JWK::KTY_OKP_X25519
+        when 'ssh-x448'
+          JOSE::JWK::KTY_OKP_X448
+        else
+          raise ArgumentError, "unrecognized openssh key type: #{pk_type.inspect}"
+        end
+        return JOSE::JWK.new(nil, *kty.from_openssh_key(key))
+      else
+        raise ArgumentError, "unrecognized openssh key format"
+      end
+    end
+
+    def self.from_openssh_key_file(file, modules = {})
+      return from_openssh_key(File.binread(file), modules)
+    end
+
     # Encode API
 
     def self.to_binary(jwk, key = nil, jwe = nil)
@@ -169,6 +204,14 @@ module JOSE
 
     def to_okp
       return kty.to_okp
+    end
+
+    def self.to_openssh_key(jwk)
+      return from(jwk).to_openssh_key
+    end
+
+    def to_openssh_key
+      return kty.to_openssh_key(fields)
     end
 
     def self.to_pem(jwk, password = nil)
@@ -451,5 +494,6 @@ module JOSE
 end
 
 require 'jose/jwk/pem'
+require 'jose/jwk/openssh_key'
 require 'jose/jwk/set'
 require 'jose/jwk/kty'

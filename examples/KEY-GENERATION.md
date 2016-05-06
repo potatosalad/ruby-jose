@@ -1,6 +1,6 @@
 # Examples: Key Generation
 
-There are two key generation methods described below for each key type:
+There are four key generation methods described below for each key type:
 
 * Method 1: OpenSSL
 * Method 2: `JOSE::JWK.generate_key`
@@ -141,7 +141,7 @@ This key type is an octet key pair with an associated curve (see [draft-ietf-jos
 
 *NOTE:* Only `Ed25519` is currently supported by `ssh-keygen`.
 
-The basic formula for generating a random octet sequence is `ssh-keygen -t TYPE -f FILE`, for example:
+The basic formula for generating a octet key pair is `ssh-keygen -t TYPE -f FILE`, for example:
 
 ```bash
 ssh-keygen -t ed25519 -f ed25519

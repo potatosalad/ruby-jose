@@ -22,7 +22,7 @@ class JOSE::JWS::ALG_none < Struct.new(:none)
   end
 
   def sign(jwk, message)
-    if JOSE.__unsecured_signing__
+    if JOSE.unsecured_signing
       return ''
     else
       raise NotImplementedError
@@ -30,7 +30,7 @@ class JOSE::JWS::ALG_none < Struct.new(:none)
   end
 
   def verify(jwk, message, signature)
-    if JOSE.__unsecured_signing__
+    if JOSE.unsecured_signing
       if signature == ''
         return true
       else

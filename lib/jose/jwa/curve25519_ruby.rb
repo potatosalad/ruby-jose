@@ -3,7 +3,7 @@ module JOSE::JWA::Curve25519_Ruby
   extend self
 
   def __ruby__?; true; end
-  def __supported__?; JOSE.__crypto_fallback__; end
+  def __supported__?; JOSE.crypto_fallback; end
 
   def ed25519_keypair(secret = nil)
     return JOSE::JWA::Ed25519.keypair(secret)

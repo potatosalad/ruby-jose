@@ -3,6 +3,11 @@ language: ruby
 sudo: required
 dist: trusty
 
+env:
+  global:
+    - JOSE_CRYPTO_FALLBACK=true
+    - RUBYOPT="-W0"
+
 rvm:
   - 2.3.1
 

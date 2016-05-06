@@ -6,68 +6,126 @@ require 'json'
 require 'openssl'
 require 'thread'
 
+# JOSE stands for JSON Object Signing and Encryption which is a is a set of
+# standards established by the [JOSE Working Group](https://datatracker.ietf.org/wg/jose).
+#
+# JOSE is split into 5 main components:
+#
+#   * {JOSE::JWA JOSE::JWA} - JSON Web Algorithms (JWA) {https://tools.ietf.org/html/rfc7518 RFC 7518}
+#   * {JOSE::JWE JOSE::JWE} - JSON Web Encryption (JWE) {https://tools.ietf.org/html/rfc7516 RFC 7516}
+#   * {JOSE::JWK JOSE::JWK} - JSON Web Key (JWK)        {https://tools.ietf.org/html/rfc7517 RFC 7517}
+#   * {JOSE::JWS JOSE::JWS} - JSON Web Signature (JWS)  {https://tools.ietf.org/html/rfc7515 RFC 7515}
+#   * {JOSE::JWT JOSE::JWT} - JSON Web Token (JWT)      {https://tools.ietf.org/html/rfc7519 RFC 7519}
+#
+# Additional specifications and drafts implemented:
+#
+#   * JSON Web Key (JWK) Thumbprint [RFC 7638](https://tools.ietf.org/html/rfc7638)
+#   * JWS Unencoded Payload Option  [draft-ietf-jose-jws-signing-input-options-04](https://tools.ietf.org/html/draft-ietf-jose-jws-signing-input-options-04)
 module JOSE
+
+  # Immutable Map structure based on `Hamster::Hash`.
   class Map < Hamster::Hash; end
-end
-
-module JOSE
-
-  extend self
-
-  MUTEX = Mutex.new
 
   @__crypto_fallback__ = ENV['JOSE_CRYPTO_FALLBACK'] ? true : false
   @__unsecured_signing__ = ENV['JOSE_UNSECURED_SIGNING'] ? true : false
 
-  def __crypto_fallback__
+  # Gets the current Cryptographic Algorithm Fallback state, defaults to `false`.
+  # @return [Boolean]
+  def self.crypto_fallback
     return @__crypto_fallback__
   end
 
-  def __crypto_fallback__=(boolean)
+  # Sets the current Cryptographic Algorithm Fallback state.
+  # @param [Boolean] boolean
+  # @return [Boolean]
+  def self.crypto_fallback=(boolean)
     boolean = !!boolean
     MUTEX.synchronize {
       @__crypto_fallback__ = boolean
       __config_change__
     }
+    return boolean
   end
 
-  def __curve25519_module__
+  # Gets the current Curve25519 module used by {JOSE::JWA::Curve25519 JOSE::JWA::Curve25519}, see {.curve25519_module=} for default.
+  # @return [Module]
+  def self.curve25519_module
     return JOSE::JWA::Curve25519.__implementation__
   end
 
-  def __curve25519_module__=(m)
-    JOSE::JWA::Curve25519.__implementation__ = m
+  # Sets the current Curve25519 module used by {JOSE::JWA::Curve25519 JOSE::JWA::Curve25519}.
+  #
+  # Currently supported Curve25519 modules (first found is used as default):
+  #
+  #   * {https://github.com/cryptosphere/rbnacl `RbNaCl`}
+  #   * {JOSE::JWA::Curve25519_Ruby JOSE::JWA::Curve25519_Ruby} - only supported when {.crypto_fallback} is `true`
+  #
+  # Additional modules that implement the functions specified in {JOSE::JWA::Curve25519 JOSE::JWA::Curve25519} may also be used.
+  # @param [Module] mod
+  # @return [Module]
+  def self.curve25519_module=(mod)
+    JOSE::JWA::Curve25519.__implementation__ = mod
   end
 
-  def __curve448_module__
+  # Gets the current Curve448 module used by {JOSE::JWA::Curve448 JOSE::JWA::Curve448}, see {.curve25519_module=} for default.
+  # @return [Module]
+  def self.curve448_module
     return JOSE::JWA::Curve448.__implementation__
   end
 
-  def __curve448_module__=(m)
-    JOSE::JWA::Curve448.__implementation__ = m
+  # Sets the current Curve448 module used by {JOSE::JWA::Curve448 JOSE::JWA::Curve448}.
+  #
+  # Currently supported Curve448 modules (first found is used as default):
+  #
+  #   * {JOSE::JWA::Curve448_Ruby JOSE::JWA::Curve448_Ruby} - only supported when {.crypto_fallback} is `true`
+  #
+  # Additional modules that implement the functions specified in {JOSE::JWA::Curve448 JOSE::JWA::Curve448} may also be used.
+  # @param [Module] mod
+  # @return [Module]
+  def self.curve448_module=(mod)
+    JOSE::JWA::Curve448.__implementation__ = mod
   end
 
-  def decode(binary)
+  # Decode JSON binary to a term.
+  # @param [String] binary
+  # @return [Object]
+  def self.decode(binary)
     return JSON.load(binary)
   end
 
-  def encode(term)
+  # Encode a term to JSON binary and sorts `Hash` and {JOSE::Map JOSE::Map} keys.
+  # @param [Object] term
+  # @return [Object]
+  def self.encode(term)
     return JSON.dump(sort_maps(term))
   end
 
-  def __unsecured_signing__
+  # Gets the current Unsecured Signing state, defaults to `false`.
+  # @return [Boolean]
+  def self.unsecured_signing
     return @__unsecured_signing__
   end
 
-  def __unsecured_signing__=(boolean)
+  # Sets the current Unsecured Signing state.
+  #
+  # Enables/disables the `"none"` algorithm used for signing and verifying.
+  #
+  # See {https://auth0.com/blog/2015/03/31/critical-vulnerabilities-in-json-web-token-libraries/ Critical vulnerabilities in JSON Web Token libraries} for more information.
+  # @param [Boolean] boolean
+  # @return [Boolean]
+  def self.unsecured_signing=(boolean)
     boolean = !!boolean
     MUTEX.synchronize {
       @__unsecured_signing__ = boolean
       __config_change__
     }
+    return boolean
   end
 
-  def urlsafe_decode64(binary)
+  # Returns the Base64Url decoded version of `binary` without padding.
+  # @param [String] binary
+  # @return [String]
+  def self.urlsafe_decode64(binary)
     case binary.bytesize % 4
     when 2
       binary += '=='
@@ -77,18 +135,21 @@ module JOSE
     return Base64.urlsafe_decode64(binary)
   end
 
-  def urlsafe_encode64(binary)
+  # Returns the Base64Url encoded version of `binary` without padding.
+  # @param [String] binary
+  # @return [String]
+  def self.urlsafe_encode64(binary)
     return Base64.urlsafe_encode64(binary).tr('=', '')
   end
 
 private
 
-  def __config_change__
+  def self.__config_change__
     JOSE::JWA::Curve25519.__config_change__
     JOSE::JWA::Curve448.__config_change__
   end
 
-  def sort_maps(term)
+  def self.sort_maps(term)
     case term
     when Hash, JOSE::Map
       return term.keys.sort.each_with_object(Hash.new) do |key, hash|

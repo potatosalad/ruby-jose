@@ -3,7 +3,7 @@ module JOSE::JWA::Curve448_Ruby
   extend self
 
   def __ruby__?; true; end
-  def __supported__?; JOSE.__crypto_fallback__; end
+  def __supported__?; JOSE.crypto_fallback; end
 
   def ed448_keypair(secret = nil)
     return JOSE::JWA::Ed448.keypair(secret)

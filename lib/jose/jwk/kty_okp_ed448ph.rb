@@ -120,8 +120,36 @@ class JOSE::JWK::KTY_OKP_Ed448ph < Struct.new(:okp)
     end
   end
 
+  def self.from_openssh_key(key)
+    type, _, sk, comment = key
+    if type and sk and type == 'ssh-ed448ph' and sk.bytesize == SK_BYTES
+      if comment == '' or comment.nil?
+        return from_okp([:Ed448ph, sk])
+      else
+        kty, fields = from_okp([:Ed448ph, sk])
+        return kty, fields.merge('kid' => comment)
+      end
+    else
+      raise ArgumentError, "unrecognized openssh key type: #{type.inspect}"
+    end
+  end
+
   def to_okp
     return [:Ed448ph, okp]
+  end
+
+  def to_openssh_key(fields)
+    comment = fields['kid'] || ''
+    pk = JOSE::JWA::Curve448.ed448ph_secret_to_public(okp)
+    sk = okp
+    return JOSE::JWK::OpenSSHKey.to_binary([
+      [
+        [
+          ['ssh-ed448ph', pk],
+          ['ssh-ed448ph', pk, sk, comment]
+        ]
+      ]
+    ])
   end
 
 end
