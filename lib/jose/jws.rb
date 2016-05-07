@@ -432,7 +432,7 @@ module JOSE
       if jws.is_a?(Array)
         return from(jws, modules).map { |obj| obj.generate_key }
       else
-        return from(object, modules).generate_key
+        return from(jws, modules).generate_key
       end
     end
 

@@ -23,6 +23,9 @@ require 'thread'
 #   * JWS Unencoded Payload Option  [draft-ietf-jose-jws-signing-input-options-04](https://tools.ietf.org/html/draft-ietf-jose-jws-signing-input-options-04)
 module JOSE
 
+  # @!visibility private
+  MUTEX = Mutex.new
+
   # Immutable Map structure based on `Hamster::Hash`.
   class Map < Hamster::Hash; end
 

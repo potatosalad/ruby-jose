@@ -72,10 +72,10 @@ module JOSE::JWA::Ed448
     curve448_scalar.setbyte(56, 0)
     a_s = OpenSSL::BN.new(curve448_scalar.reverse, 2).to_i
     # Calculate r_s and r (r only used in encoded form)
-    r_s = (OpenSSL::BN.new(JOSE::JWA::SHA3.shake256(['SigEd448', 0, ctx.bytesize, ctx, seed, m].pack('A*CCA*A*A*'), 114).reverse, 2) % JOSE::JWA::Edwards448Point::L).to_i
+    r_s = (OpenSSL::BN.new(JOSE::JWA::SHA3.shake256(['SigEd448', 0, ctx.bytesize, ctx, seed, m].pack('a*CCa*a*a*'), 114).reverse, 2) % JOSE::JWA::Edwards448Point::L).to_i
     r = (C_B * r_s).encode()
     # Calculate h.
-    h = (OpenSSL::BN.new(JOSE::JWA::SHA3.shake256(['SigEd448', 0, ctx.bytesize, ctx, r, pk, m].pack('A*CCA*A*A*A*'), 114).reverse, 2) % JOSE::JWA::Edwards448Point::L).to_i
+    h = (OpenSSL::BN.new(JOSE::JWA::SHA3.shake256(['SigEd448', 0, ctx.bytesize, ctx, r, pk, m].pack('a*CCa*a*a*a*'), 114).reverse, 2) % JOSE::JWA::Edwards448Point::L).to_i
     # Calculate s.
     s = OpenSSL::BN.new((r_s+h*a_s) % JOSE::JWA::Edwards448Point::L).to_s(2).rjust(C_bytes, JOSE::JWA::ZERO_PAD).reverse
     # The final signature is concatenation of r and s.
@@ -86,7 +86,7 @@ module JOSE::JWA::Ed448
     raise ArgumentError, "sk must be #{C_secretkeybytes} bytes" if sk.bytesize != C_secretkeybytes and sk.bytesize != C_legacysecretkeybytes
     ctx ||= ''
     raise ArgumentError, "ctx must be 255 bytes or smaller" if ctx.bytesize > 255
-    m = JOSE::JWA::SHA3.shake256(['SigEd448', 2, ctx.bytesize, ctx, m].pack('A*CCA*A*'), 64)
+    m = JOSE::JWA::SHA3.shake256(['SigEd448', 2, ctx.bytesize, ctx, m].pack('a*CCa*a*'), 64)
     secret, pk = nil, nil
     if sk.bytesize == C_secretkeybytes
       secret, pk = sk[0, 57], sk[57, 114]
@@ -100,10 +100,10 @@ module JOSE::JWA::Ed448
     curve448_scalar.setbyte(56, 0)
     a_s = OpenSSL::BN.new(curve448_scalar.reverse, 2).to_i
     # Calculate r_s and r (r only used in encoded form)
-    r_s = (OpenSSL::BN.new(JOSE::JWA::SHA3.shake256(['SigEd448', 1, ctx.bytesize, ctx, seed, m].pack('A*CCA*A*A*'), 114).reverse, 2) % JOSE::JWA::Edwards448Point::L).to_i
+    r_s = (OpenSSL::BN.new(JOSE::JWA::SHA3.shake256(['SigEd448', 1, ctx.bytesize, ctx, seed, m].pack('a*CCa*a*a*'), 114).reverse, 2) % JOSE::JWA::Edwards448Point::L).to_i
     r = (C_B * r_s).encode()
     # Calculate h.
-    h = (OpenSSL::BN.new(JOSE::JWA::SHA3.shake256(['SigEd448', 1, ctx.bytesize, ctx, r, pk, m].pack('A*CCA*A*A*A*'), 114).reverse, 2) % JOSE::JWA::Edwards448Point::L).to_i
+    h = (OpenSSL::BN.new(JOSE::JWA::SHA3.shake256(['SigEd448', 1, ctx.bytesize, ctx, r, pk, m].pack('a*CCa*a*a*a*'), 114).reverse, 2) % JOSE::JWA::Edwards448Point::L).to_i
     # Calculate s.
     s = OpenSSL::BN.new((r_s+h*a_s) % JOSE::JWA::Edwards448Point::L).to_s(2).rjust(C_bytes, JOSE::JWA::ZERO_PAD).reverse
     # The final signature is concatenation of r and s.
@@ -124,7 +124,7 @@ module JOSE::JWA::Ed448
     # Check parse results.
     return false if r_p.nil? or a_p.nil? or s_s > JOSE::JWA::Edwards448Point::L
     # Calculate h.
-    h = (OpenSSL::BN.new(JOSE::JWA::SHA3.shake256(['SigEd448', 0, ctx.bytesize, ctx, r, pk, m].pack('A*CCA*A*A*A*'), 114).reverse, 2) % JOSE::JWA::Edwards448Point::L).to_i
+    h = (OpenSSL::BN.new(JOSE::JWA::SHA3.shake256(['SigEd448', 0, ctx.bytesize, ctx, r, pk, m].pack('a*CCa*a*a*a*'), 114).reverse, 2) % JOSE::JWA::Edwards448Point::L).to_i
     # Calculate left and right sides of check eq.
     rhs = r_p + (a_p * h)
     lhs = C_B * s_s
@@ -139,7 +139,7 @@ module JOSE::JWA::Ed448
   def verify_ph(sig, m, pk, ctx = nil)
     ctx ||= ''
     raise ArgumentError, "ctx must be 255 bytes or smaller" if ctx.bytesize > 255
-    m = JOSE::JWA::SHA3.shake256(['SigEd448', 2, ctx.bytesize, ctx, m].pack('A*CCA*A*'), 64)
+    m = JOSE::JWA::SHA3.shake256(['SigEd448', 2, ctx.bytesize, ctx, m].pack('a*CCa*a*'), 64)
     # Sanity-check sizes.
     return false if sig.bytesize != C_signaturebytes
     return false if pk.bytesize != C_publickeybytes
@@ -151,7 +151,7 @@ module JOSE::JWA::Ed448
     # Check parse results.
     return false if r_p.nil? or a_p.nil? or s_s > JOSE::JWA::Edwards448Point::L
     # Calculate h.
-    h = (OpenSSL::BN.new(JOSE::JWA::SHA3.shake256(['SigEd448', 1, ctx.bytesize, ctx, r, pk, m].pack('A*CCA*A*A*A*'), 114).reverse, 2) % JOSE::JWA::Edwards448Point::L).to_i
+    h = (OpenSSL::BN.new(JOSE::JWA::SHA3.shake256(['SigEd448', 1, ctx.bytesize, ctx, r, pk, m].pack('a*CCa*a*a*a*'), 114).reverse, 2) % JOSE::JWA::Edwards448Point::L).to_i
     # Calculate left and right sides of check eq.
     rhs = r_p + (a_p * h)
     lhs = C_B * s_s

@@ -19,7 +19,7 @@ class JOSE::JWK::KTY_EC < Struct.new(:key)
       y = JOSE.urlsafe_decode64(fields['y'])
       ec.public_key = OpenSSL::PKey::EC::Point.new(
         OpenSSL::PKey::EC::Group.new(crv),
-        OpenSSL::BN.new([0x04, x, y].pack('CA*A*'), 2)
+        OpenSSL::BN.new([0x04, x, y].pack('Ca*a*'), 2)
       )
       if fields['d'].is_a?(String)
         ec.private_key = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2)
@@ -38,11 +38,11 @@ class JOSE::JWK::KTY_EC < Struct.new(:key)
     ec_point = key.public_key.to_bn.to_s(2)
     ec_point_x, ec_point_y = case ec_point.bytesize
     when 65
-      ec_point.unpack('xA32A32')
+      ec_point.unpack('xa32a32')
     when 97
-      ec_point.unpack('xA48A48')
+      ec_point.unpack('xa48a48')
     when 133
-      ec_point.unpack('xA66A66')
+      ec_point.unpack('xa66a66')
     else
       raise ArgumentError, "unhandled EC point size: #{ec_point.bytesize.inspect}"
     end
