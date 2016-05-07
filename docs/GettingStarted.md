@@ -1,6 +1,32 @@
-## Usage
+# @title Getting Started
 
-The simplest combination might be {"alg":"dir","enc":"A128GCM"} which requires a 128-bit (or 16-byte) key that must be fully known by both parties.
+# Getting Started
+
+JOSE stands for JSON Object Signing and Encryption which is a is a set of
+standards established by the [JOSE Working Group](https://datatracker.ietf.org/wg/jose).
+
+JOSE is split into 5 main components:
+
+  * {JOSE::JWA JOSE::JWA} - JSON Web Algorithms (JWA) {https://tools.ietf.org/html/rfc7518 RFC 7518}
+  * {JOSE::JWE JOSE::JWE} - JSON Web Encryption (JWE) {https://tools.ietf.org/html/rfc7516 RFC 7516}
+  * {JOSE::JWK JOSE::JWK} - JSON Web Key (JWK)        {https://tools.ietf.org/html/rfc7517 RFC 7517}
+  * {JOSE::JWS JOSE::JWS} - JSON Web Signature (JWS)  {https://tools.ietf.org/html/rfc7515 RFC 7515}
+  * {JOSE::JWT JOSE::JWT} - JSON Web Token (JWT)      {https://tools.ietf.org/html/rfc7519 RFC 7519}
+
+Additional specifications and drafts implemented:
+
+  * JSON Web Key (JWK) Thumbprint [RFC 7638](https://tools.ietf.org/html/rfc7638)
+  * JWS Unencoded Payload Option  [draft-ietf-jose-jws-signing-input-options-04](https://tools.ietf.org/html/draft-ietf-jose-jws-signing-input-options-04)
+
+## More Information
+
+  * {file:docs/KeyGeneration.md}
+  * {file:docs/EncryptionAlgorithms.md}
+  * {file:docs/SignatureAlgorithms.md}
+
+## Usage Examples
+
+The simplest combination might be `{"alg":"dir","enc":"A128GCM"}` which requires a 128-bit (or 16-byte) key that must be fully known by both parties.
 
 ```ruby
 # Alice wants to send Bob an encrypted message.

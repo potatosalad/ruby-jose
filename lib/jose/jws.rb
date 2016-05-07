@@ -77,7 +77,7 @@ module JOSE
   #
   # All of the example keys generated below can be found here: [https://gist.github.com/potatosalad/925a8b74d85835e285b9](https://gist.github.com/potatosalad/925a8b74d85835e285b9)
   #
-  # ### Ed25519 and Ed25519ph
+  # ### <a name="EdDSA-25519-group">Ed25519 and Ed25519ph</a>
   #
   #     !!!ruby
   #     # let's generate the 2 keys we'll use below
@@ -96,7 +96,7 @@ module JOSE
   #     JOSE::JWS.verify(jwk_ed25519ph, signed_ed25519ph).first
   #     # => true
   #
-  # ### Ed448 and Ed448ph
+  # ### <a name="EdDSA-448-group">Ed448 and Ed448ph</a>
   #
   #     !!!ruby
   #     # let's generate the 2 keys we'll use below
@@ -115,7 +115,7 @@ module JOSE
   #     JOSE::JWS.verify(jwk_ed448ph, signed_ed448ph).first
   #     # => true
   #
-  # ### ES256, ES384, and ES512
+  # ### <a name="ECDSA-group">ES256, ES384, and ES512</a>
   #
   #     !!!ruby
   #     # let's generate the 3 keys we'll use below
@@ -141,7 +141,7 @@ module JOSE
   #     JOSE::JWS.verify(jwk_es512, signed_es512).first
   #     # => true
   #
-  # ### HS256, HS384, and HS512
+  # ### <a name="HMACSHA2-group">HS256, HS384, and HS512</a>
   #
   #     !!!ruby
   #     # let's generate the 3 keys we'll use below
@@ -167,7 +167,7 @@ module JOSE
   #     JOSE::JWS.verify(jwk_hs512, signed_hs512).first
   #     # => true
   #
-  # ### PS256, PS384, and PS512
+  # ### <a name="RSASSAPSS-group">PS256, PS384, and PS512</a>
   #
   #     !!!ruby
   #     # let's generate the 3 keys we'll use below (cutkey must be installed as a dependency)
@@ -193,7 +193,7 @@ module JOSE
   #     JOSE::JWS.verify(jwk_ps512, signed_ps512).first
   #     # => true
   #
-  # ### RS256, RS384, and RS512
+  # ### <a name="RSASSAPKCS1_5-group">RS256, RS384, and RS512</a>
   #
   #     !!!ruby
   #     # let's generate the 3 keys we'll use below
@@ -280,7 +280,7 @@ module JOSE
     end
 
     # Reads file and calls {.from_binary} to convert into a {JOSE::JWS JOSE::JWS}.
-    # @param [String] object
+    # @param [String] file
     # @param [Hash] modules
     # @return [JOSE::JWS]
     def self.from_file(file, modules = {})

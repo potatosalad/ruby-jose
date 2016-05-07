@@ -1,11 +1,13 @@
-# Examples: Key Generation
+# @title Key Generation
+
+# Key Generation
 
 There are four key generation methods described below for each key type:
 
 * Method 1: OpenSSL
-* Method 2: `JOSE::JWK.generate_key`
-* Method 3: `JOSE::JWE.generate_key`
-* Method 4: `JOSE::JWS.generate_key`
+* Method 2: {JOSE::JWK.generate_key JOSE::JWK.generate_key}
+* Method 3: {JOSE::JWE.generate_key JOSE::JWE.generate_key}
+* Method 4: {JOSE::JWS.generate_key JOSE::JWS.generate_key}
 
 ## EC
 
@@ -25,7 +27,7 @@ openssl ecparam -name secp384r1 -genkey -noout -out ec-secp384r1.pem
 openssl ecparam -name secp521r1 -genkey -noout -out ec-secp521r1.pem
 ```
 
-The PEM files can then be read using `JOSE::JWK.from_pem_file`:
+The PEM files can then be read using {JOSE::JWK.from_pem_file JOSE::JWK.from_pem_file}:
 
 ```ruby
 jwk = JOSE::JWK.from_pem_file("ec-secp256r1.pem")
@@ -89,7 +91,7 @@ The basic formula for generating a random octet sequence is `openssl rand -out F
 openssl rand -out oct-128-bit.bin 16
 ```
 
-The binary file can then be read using `JOSE::JWK.from_oct_file`:
+The binary file can then be read using {JOSE::JWK.from_oct_file JOSE::JWK.from_oct_file}:
 
 ```ruby
 jwk = JOSE::JWK.from_oct_file("oct-128-bit.bin")
@@ -147,7 +149,7 @@ The basic formula for generating a octet key pair is `ssh-keygen -t TYPE -f FILE
 ssh-keygen -t ed25519 -f ed25519
 ```
 
-The private key file can then be read using `JOSE::JWK.from_openssh_key_file`:
+The private key file can then be read using {JOSE::JWK.from_openssh_key_file JOSE::JWK.from_openssh_key_file}:
 
 ```ruby
 jwk = JOSE::JWK.from_openssh_key_file("ed25519")
@@ -158,12 +160,12 @@ jwk = JOSE::JWK.from_openssh_key_file("ed25519")
 Calling either of these functions with a specified curve will generate an octet key pair.  You may also specify the secret portion of the key after the curve.
 
 ```ruby
-% Curve25519
+# Curve25519
 jwk_Ed25519   = JOSE::JWK.generate_key([:okp, :Ed25519])
 jwk_Ed25519ph = JOSE::JWK.generate_key([:okp, :Ed25519ph])
 jwk_X25519    = JOSE::JWK.generate_key([:okp, :X25519])
 
-% Curve448
+# Curve448
 jwk_Ed448   = JOSE::JWK.generate_key([:okp, :Ed448])
 jwk_Ed448ph = JOSE::JWK.generate_key([:okp, :Ed448ph])
 jwk_X448    = JOSE::JWK.generate_key([:okp, :X448])
@@ -210,7 +212,7 @@ The basic formula for generating a RSA key is `openssl genrsa -out FILE BIT_SIZE
 openssl genrsa -out rsa-2048.pem 2048
 ```
 
-The PEM file can then be read using `JOSE::JWK.from_pem_file`:
+The PEM file can then be read using {JOSE::JWK.from_pem_file JOSE::JWK.from_pem_file}:
 
 ```ruby
 jwk = JOSE::JWK.from_pem_file("rsa-2048.pem")

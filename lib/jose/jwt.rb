@@ -108,7 +108,7 @@ module JOSE
     end
 
     # Reads file and calls {.from_binary} to convert into a {JOSE::JWT JOSE::JWT}.
-    # @param [String] object
+    # @param [String] file
     # @param [Hash] modules
     # @return [JOSE::JWT]
     def self.from_file(file, modules = {})
@@ -186,7 +186,7 @@ module JOSE
     # Decrypts an encrypted {JOSE::JWT JOSE::JWT} using the `jwk`.
     # @see JOSE::JWE.block_decrypt
     # @param [JOSE::JWK] jwk
-    # @param [JOSE::EncryptedBinary, JOSE::EncryptedMap]
+    # @param [JOSE::EncryptedBinary, JOSE::EncryptedMap] encrypted
     # @return [[JOSE::JWT, JOSE::JWE]]
     def self.decrypt(jwk, encrypted)
       decrypted, jwe = JOSE::JWK.block_decrypt(jwk, encrypted)

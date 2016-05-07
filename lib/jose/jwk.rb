@@ -84,7 +84,7 @@ module JOSE
 
     # Reads file and calls {.from_binary} to convert into a {JOSE::JWK JOSE::JWK}.
     #
-    # @param [String] object
+    # @param [String] file
     # @param [Hash] modules
     # @param [String] key
     # @return [JOSE::JWK]
@@ -265,7 +265,6 @@ module JOSE
 
     # Converts a {JOSE::JWK JOSE::JWK} into a binary.
     #
-    # @param [JOSE::JWK] jwk
     # @param [String] key
     # @param [JOSE::JWE] jwe
     # @return [String, JOSE::EncryptedBinary]
@@ -667,7 +666,6 @@ module JOSE
     #
     # @see JOSE::JWK.box_encrypt
     # @see JOSE::JWE.block_decrypt
-    # @param [JOSE::JWK] jwk
     # @param [JOSE::EncryptedBinary, JOSE::EncryptedMap] encrypted
     # @param [JOSE::JWK] public_jwk
     # @return [[String, JOSE::JWE]]
@@ -739,7 +737,7 @@ module JOSE
 
     # Derives a key (typically just returns a binary representation of the key).
     #
-    # @param [*Object] *args
+    # @param [*Object] args
     # @return [String]
     def derive_key(*args)
       return kty.derive_key(*args)

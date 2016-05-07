@@ -132,7 +132,7 @@ module JOSE
   #     jwk_rsa_sk = JOSE::JWK.generate_key([:rsa, 4096])
   #     jwk_rsa_pk = JOSE::JWK.to_public(jwk_rsa_sk)
   #
-  # ### A128GCMKW, A192GCMKW, and A256GCMKW
+  # ### <a name="AESGCMKW-group">A128GCMKW, A192GCMKW, and A256GCMKW</a>
   #
   #     !!!ruby
   #     # A128GCMKW
@@ -153,7 +153,7 @@ module JOSE
   #     JOSE::JWE.block_decrypt(jwk_oct256, encrypted_a256gcmkw).first
   #     # => "{}"
   #
-  # ### A128KW, A192KW, and A256KW
+  # ### <a name="AESKW-group">A128KW, A192KW, and A256KW</a>
   #
   #     !!!ruby
   #     # A128KW
@@ -174,7 +174,7 @@ module JOSE
   #     JOSE::JWE.block_decrypt(jwk_oct256, encrypted_a256kw).first
   #     # => "{}"
   #
-  # ### dir
+  # ### <a href="direct-group">dir</a>
   #
   # The `"dir"` key derivation algorithm is essentially just a pass-through to the underlying `"enc"` algorithm.
   #
@@ -187,7 +187,7 @@ module JOSE
   #     JOSE::JWE.block_decrypt(jwk_oct128, encrypted_dir).first
   #     # => "{}"
   #
-  # ### ECDH-ES, ECDH-ES+A128KW, ECDH-ES+A192KW, and ECDH-ES+A256KW
+  # ### <a name="ECDH-ES-group">ECDH-ES, ECDH-ES+A128KW, ECDH-ES+A192KW, and ECDH-ES+A256KW</a>
   #
   # The `"ECDH-ES"` key derivation algorithm does not include the `"encrypted_key"` field in the protected header, similar to how `"dir"` functions.
   #
@@ -244,7 +244,7 @@ module JOSE
   #
   # See {JOSE::JWK.box_encrypt JOSE::JWK.box_encrypt} for generating an Ephemeral Public Key based on the same curve as the supplied other party key in the same step.
   #
-  # ### PBES2-HS256+A128KW, PBES2-HS384+A192KW, and PBES2-HS512+A256KW
+  # ### <a name="PBES2-group">PBES2-HS256+A128KW, PBES2-HS384+A192KW, and PBES2-HS512+A256KW</a>
   #
   #     !!!ruby
   #     # PBES2-HS256+A128KW
@@ -287,7 +287,7 @@ module JOSE
   #     JOSE::JWE.block_decrypt(jwk_secret, encrypted_pbes2).first
   #     # => "{}"
   #
-  # ### RSA1_5, RSA-OAEP, and RSA-OAEP-256
+  # ### <a name="RSA-group">RSA1_5, RSA-OAEP, and RSA-OAEP-256</a>
   #
   #     !!!ruby
   #     # RSA1_5
@@ -324,7 +324,7 @@ module JOSE
   #     jwk_oct384 = JOSE::JWK.from_oct(([0]*48).pack('C*'))
   #     jwk_oct512 = JOSE::JWK.from_oct(([0]*64).pack('C*'))
   #
-  # ### A128CBC-HS256, A192CBC-HS384, and A256CBC-HS512
+  # ### <a name="AESCBC-group">A128CBC-HS256, A192CBC-HS384, and A256CBC-HS512</a>
   #
   #     !!!ruby
   #     # A128CBC-HS256
@@ -345,7 +345,7 @@ module JOSE
   #     JOSE::JWE.block_decrypt(jwk_oct512, encrypted_a256cbchs512).first
   #     # => "{}"
   #
-  # ### A128GCM, A192GCM, and A256GCM
+  # ### <a name="AESGCM-group">A128GCM, A192GCM, and A256GCM</a>
   #
   #     !!!ruby
   #     # A128GCM
@@ -378,7 +378,7 @@ module JOSE
   #     # octet keys we'll use below
   #     jwk_oct128 = JOSE::JWK.from_oct(([0]*16).pack('C*'))
   #
-  # ### DEF
+  # ### <a name="DEF-group">DEF</a>
   #
   #     !!!ruby
   #     # DEF
@@ -456,7 +456,7 @@ module JOSE
     end
 
     # Reads file and calls {.from_binary} to convert into a {JOSE::JWE JOSE::JWE}.
-    # @param [String] object
+    # @param [String] file
     # @param [Hash] modules
     # @return [JOSE::JWE]
     def self.from_file(file, modules = {})

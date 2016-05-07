@@ -45,11 +45,12 @@ verified, message, = jwk.verify(signed)
 ```
 
 More details and examples:
-- [cipher support](doc_usage/alg_enc.md)
-- [key generation](doc_usage/keygen.md)
-- [various usage examples](doc_usage/examples.md)
+- [Getting Started](http://www.rubydoc.info/gems/jose/file/docs/GettingStarted.md)
+- [Key Generation](http://www.rubydoc.info/gems/jose/file/docs/KeyGeneration.md)
+- [Encryption Algorithms](http://www.rubydoc.info/gems/jose/file/docs/EncryptionAlgorithms.md)
+- [Signature Algorithms](http://www.rubydoc.info/gems/jose/file/docs/SignatureAlgorithms.md)
 
-Finally, the [erlang-jose documentation](https://hexdocs.pm/jose/) can provide an idea of the functionality available in this gem.
+Finally, the [erlang-jose documentation](https://hexdocs.pm/jose/) can provide more ideas of the functionality available in this gem.
 
 ## Development
 
