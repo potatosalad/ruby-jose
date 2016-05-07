@@ -231,15 +231,15 @@ module JOSE
   #     # => "{}"
   #
   #     # ECDH-ES+A192KW with EC keypairs
-  #     encrypted_ecdhesa192kw_alice2bob = JOSE::JWE.block_encrypt({jwk_ec256_bob_pk, jwk_ec256_alice_sk}, "{}", { "alg" => "ECDH-ES+A192KW", "enc" => "A192GCM" }).compact
+  #     encrypted_ecdhesa192kw_alice2bob = JOSE::JWE.block_encrypt([jwk_ec256_bob_pk, jwk_ec256_alice_sk], "{}", { "alg" => "ECDH-ES+A192KW", "enc" => "A192GCM" }).compact
   #     # => "eyJhbGciOiJFQ0RILUVTK0ExOTJLVyIsImVuYyI6IkExOTJHQ00iLCJlcGsiOnsiY3J2IjoiUC0yNTYiLCJrdHkiOiJFQyIsIngiOiI0OFFVM1EwQ3lTeHdKYkV3V3JKcllYbHA4OF9kVnBIVHhxNGF2YzY2aDVRIiwieSI6Ilp6cXJJTnRNTXhIeFEtUUI3MlJNY2RsbURzT0l3bEtoTXFWbV9nWVdDMTQifX0.S9LZ1i_Lua_if4I83WcaCQ9yT5qqPI_NhCFR7tMiZDQ.kG3taKEjGeKDRTzs.H1s.oVGBFP63z4gd3e-R2d1cmA"
-  #     JOSE::JWE.block_decrypt({jwk_ec256_alice_pk, jwk_ec256_bob_sk}, encrypted_ecdhesa192kw_alice2bob).first
+  #     JOSE::JWE.block_decrypt([jwk_ec256_alice_pk, jwk_ec256_bob_sk], encrypted_ecdhesa192kw_alice2bob).first
   #     # => "{}"
   #
   #     # ECDH-ES+A256KW with EC keypairs
-  #     encrypted_ecdhesa256kw_alice2bob = JOSE::JWE.block_encrypt({jwk_ec256_bob_pk, jwk_ec256_alice_sk}, "{}", { "alg" => "ECDH-ES+A256KW", "enc" => "A256GCM" }).compact
+  #     encrypted_ecdhesa256kw_alice2bob = JOSE::JWE.block_encrypt([jwk_ec256_bob_pk, jwk_ec256_alice_sk], "{}", { "alg" => "ECDH-ES+A256KW", "enc" => "A256GCM" }).compact
   #     # => "eyJhbGciOiJFQ0RILUVTK0EyNTZLVyIsImVuYyI6IkEyNTZHQ00iLCJlcGsiOnsiY3J2IjoiUC0yNTYiLCJrdHkiOiJFQyIsIngiOiI0OFFVM1EwQ3lTeHdKYkV3V3JKcllYbHA4OF9kVnBIVHhxNGF2YzY2aDVRIiwieSI6Ilp6cXJJTnRNTXhIeFEtUUI3MlJNY2RsbURzT0l3bEtoTXFWbV9nWVdDMTQifX0.4KWy1-vRiJyNINF6mWYbUPPTVNG9ADfvvfpSDbddPTftz7GmUHUsuQ.IkRhtGH23R-9dFF3.9yk.RnALhnqWMHWCZFxqc-DU4A"
-  #     JOSE::JWE.block_decrypt({jwk_ec256_alice_pk, jwk_ec256_bob_sk}, encrypted_ecdhesa256kw_alice2bob).first
+  #     JOSE::JWE.block_decrypt([jwk_ec256_alice_pk, jwk_ec256_bob_sk], encrypted_ecdhesa256kw_alice2bob).first
   #     # => "{}"
   #
   # See {JOSE::JWK.box_encrypt JOSE::JWK.box_encrypt} for generating an Ephemeral Public Key based on the same curve as the supplied other party key in the same step.
