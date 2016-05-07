@@ -24,7 +24,7 @@ Or install it yourself as:
 
 ## Usage
 
-Better documentation is in progress, but the [erlang-jose documentation](https://hexdocs.pm/jose/) can provide an idea of the functionality available in this gem.
+Better documentation is in progress, but here are a few resources to get started. First, a simple example of key generation and message signing:
 
 ```ruby
 # Let's use our secret key "symmetric key" for use with
@@ -44,6 +44,13 @@ verified, message, = jwk.verify(signed)
 # => [true, "test"]
 ```
 
+More details and examples:
+- [cipher support](doc_usage/alg_enc.md)
+- [key generation](doc_usage/keygen.md)
+- [various usage examples](doc_usage/examples.md)
+
+Finally, the [erlang-jose documentation](https://hexdocs.pm/jose/) can provide an idea of the functionality available in this gem.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
@@ -57,4 +64,3 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/potato
 ## License
 
 The gem is available as open source under the terms of the [MPL-2.0 License](http://opensource.org/licenses/MPL-2.0).
-
