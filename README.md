@@ -1,6 +1,6 @@
 # JOSE
 
-[![Travis](https://img.shields.io/travis/potatosalad/ruby-jose.svg?maxAge=2592000)](https://travis-ci.org/potatosalad/ruby-jose) [![Gem](https://img.shields.io/gem/v/jose.svg?maxAge=2592000)](https://rubygems.org/gems/jose) [![Docs](https://img.shields.io/badge/yard-docs-blue.svg?maxAge=2592000)](http://www.rubydoc.info/gems/jose)
+[![Travis](https://img.shields.io/travis/potatosalad/ruby-jose.svg?maxAge=2592000)](https://travis-ci.org/potatosalad/ruby-jose) [![Gem](https://img.shields.io/gem/v/jose.svg?maxAge=2592000)](https://rubygems.org/gems/jose) [![Docs](https://img.shields.io/badge/yard-docs-blue.svg?maxAge=2592000)](http://www.rubydoc.info/gems/jose) [![Inline docs](http://inch-ci.org/github/potatosalad/ruby-jose.svg?branch=master&style=shields)](http://inch-ci.org/github/potatosalad/ruby-jose)
 
 JSON Object Signing and Encryption (JOSE) for Ruby.
 

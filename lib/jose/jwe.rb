@@ -1,11 +1,14 @@
 module JOSE
 
   class EncryptedBinary < ::String
+    # Expands a compacted encrypted binary or list of encrypted binaries into a map.
+    # @see JOSE::JWE.expand
     def expand
       return JOSE::JWE.expand(self)
     end
   end
 
+  # Immutable encrypted Map structure based on {JOSE::Map JOSE::Map}.
   class EncryptedMap < JOSE::Map
     def compact
       return JOSE::JWE.compact(self)
