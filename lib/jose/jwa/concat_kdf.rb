@@ -11,6 +11,8 @@ module JOSE::JWA::ConcatKDF
     end
     if other_info.is_a?(Array)
       algorithm_id, party_u_info, party_v_info, supp_pub_info, supp_priv_info = other_info
+      party_u_info ||= ''
+      party_v_info ||= ''
       supp_pub_info ||= ''
       supp_priv_info ||= ''
       other_info = [

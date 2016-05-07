@@ -285,8 +285,17 @@ module JOSE
       return from(jwk).box_decrypt(encrypted)
     end
 
-    def box_decrypt(encrypted)
-      return JOSE::JWE.block_decrypt(self, encrypted)
+    def box_decrypt(encrypted, public_jwk = nil)
+      if public_jwk
+        return JOSE::JWE.block_decrypt([public_jwk, self], encrypted)
+      else
+        return JOSE::JWE.block_decrypt(self, encrypted)
+      end
+    end
+
+    def self.box_encrypt(plain_text, box_keys, jwe = nil)
+      other_public_key, my_private_key = box_keys
+      return from(other_public_key).box_encrypt(plain_text, my_private_jwk, jwe)
     end
 
     # Generates an ephemeral private key based on other public key curve.

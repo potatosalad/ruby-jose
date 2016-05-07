@@ -10,8 +10,8 @@ module JOSE
   # ### A128GCM
   #
   #     !!!ruby
-  #     jwk_oct128 = JOSE::JWK.generate_key([:oct, 16])
-  #     jwt       = { "test" => true }
+  #     jwk_oct128 = JOSE::JWK.from_oct(([0]*16).pack('C*'))
+  #     jwt        = { "test" => true }
   #
   #     # A128GCM
   #     encrypted_a128gcm = JOSE::JWT.encrypt(jwk_oct128, { "alg" => "dir", "enc" => "A128GCM" }, jwt).compact

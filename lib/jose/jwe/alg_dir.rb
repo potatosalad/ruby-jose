@@ -1,11 +1,11 @@
-class JOSE::JWE::ALG_dir
+class JOSE::JWE::ALG_dir < Struct.new(:direct)
 
   # JOSE::JWE callbacks
 
   def self.from_map(fields)
     case fields['alg']
     when 'dir'
-      return new(), fields.delete('alg')
+      return new(true), fields.delete('alg')
     else
       raise ArgumentError, "invalid 'alg' for JWE: #{fields['alg'].inspect}"
     end
@@ -35,9 +35,9 @@ class JOSE::JWE::ALG_dir
 
   def next_cek(key, enc)
     if key.is_a?(String)
-      return key
+      return key, self
     else
-      return key.kty.derive_key
+      return key.kty.derive_key, self
     end
   end
 

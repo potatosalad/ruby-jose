@@ -57,26 +57,31 @@ class JOSE::JWE::ALG_ECDH_ES < Struct.new(:bits, :epk, :apu, :apv)
 
   def key_decrypt(box_keys, enc, encrypted_key)
     other_public_key, my_private_key = box_keys
-    if my_private_key and epk and epk.to_key != other_public_key.to_key
-      raise ArgumentError, "other and ephemeral public key mismatch"
-    elsif epk and my_private_key.nil?
+    if my_private_key.nil?
       my_private_key = other_public_key
-      other_public_key = epk
-    else
-      raise ArgumentError, "missing 'epk' or my_private_key"
+      other_public_key = nil
     end
-    z = other_public_key.derive_key(my_private_key)
+    if epk.nil? and other_public_key.nil?
+      raise ArgumentError, "missing 'epk' and 'other_public_key'"
+    elsif epk and other_public_key and epk.thumbprint != other_public_key.thumbprint
+      raise ArgumentError, "other and ephemeral public key mismatch"
+    end
+    new_alg = self
+    if epk.nil?
+      new_alg = JOSE::JWE::ALG_ECDH_ES.new(bits, other_public_key.to_public, apu, apv)
+    end
+    z = new_alg.epk.derive_key(my_private_key)
     if bits.nil?
       algorithm_id = enc.algorithm
       key_data_len = enc.bits
       supp_pub_info = [key_data_len].pack('N')
-      derived_key = JOSE::JWA::ConcatKDF.kdf(OpenSSL::Digest::SHA256, z, [algorithm_id, apu, apv, supp_pub_info], key_data_len)
+      derived_key = JOSE::JWA::ConcatKDF.kdf(OpenSSL::Digest::SHA256, z, [algorithm_id, new_alg.apu, new_alg.apv, supp_pub_info], key_data_len)
       return derived_key
     else
-      algorithm_id = algorithm
-      key_data_len = bits
+      algorithm_id = new_alg.algorithm
+      key_data_len = new_alg.bits
       supp_pub_info = [key_data_len].pack('N')
-      derived_key = JOSE::JWA::ConcatKDF.kdf(OpenSSL::Digest::SHA256, z, [algorithm_id, apu, apv, supp_pub_info], key_data_len)
+      derived_key = JOSE::JWA::ConcatKDF.kdf(OpenSSL::Digest::SHA256, z, [algorithm_id, new_alg.apu, new_alg.apv, supp_pub_info], key_data_len)
       decrypted_key = JOSE::JWA::AES_KW.unwrap(encrypted_key, derived_key)
       return decrypted_key
     end
@@ -87,27 +92,49 @@ class JOSE::JWE::ALG_ECDH_ES < Struct.new(:bits, :epk, :apu, :apv)
       return '', self
     else
       other_public_key, my_private_key = box_keys
+      if my_private_key.nil?
+        raise ArgumentError, "missing 'my_private_key'"
+      elsif other_public_key.nil?
+        raise ArgumentError, "missing 'other_public_key'"
+      elsif epk and my_private_key and epk.thumbprint != my_private_key.thumbprint
+        raise ArgumentError, "private and ephemeral public key mismatch"
+      end
+      new_alg = self
+      if epk.nil?
+        new_alg = JOSE::JWE::ALG_ECDH_ES.new(bits, my_private_key.to_public, apu, apv)
+      end
       z = other_public_key.derive_key(my_private_key)
-      algorithm_id = algorithm
-      key_data_len = bits
+      algorithm_id = new_alg.algorithm
+      key_data_len = new_alg.bits
       supp_pub_info = [key_data_len].pack('N')
-      derived_key = JOSE::JWA::ConcatKDF.kdf(OpenSSL::Digest::SHA256, z, [algorithm_id, apu, apv, supp_pub_info], key_data_len)
+      derived_key = JOSE::JWA::ConcatKDF.kdf(OpenSSL::Digest::SHA256, z, [algorithm_id, new_alg.apu, new_alg.apv, supp_pub_info], key_data_len)
       encrypted_key = JOSE::JWA::AES_KW.wrap(decrypted_key, derived_key)
-      return encrypted_key, self
+      return encrypted_key, new_alg
     end
   end
 
   def next_cek(box_keys, enc)
     if bits.nil?
       other_public_key, my_private_key = box_keys
+      if my_private_key.nil?
+        raise ArgumentError, "missing 'my_private_key'"
+      elsif other_public_key.nil?
+        raise ArgumentError, "missing 'other_public_key'"
+      elsif epk and my_private_key and epk.thumbprint != my_private_key.thumbprint
+        raise ArgumentError, "private and ephemeral public key mismatch"
+      end
+      new_alg = self
+      if epk.nil?
+        new_alg = JOSE::JWE::ALG_ECDH_ES.new(bits, my_private_key.to_public, apu, apv)
+      end
       z = other_public_key.derive_key(my_private_key)
       algorithm_id = enc.algorithm
       key_data_len = enc.bits
       supp_pub_info = [key_data_len].pack('N')
-      derived_key = JOSE::JWA::ConcatKDF.kdf(OpenSSL::Digest::SHA256, z, [algorithm_id, apu, apv, supp_pub_info], key_data_len)
-      return derived_key
+      derived_key = JOSE::JWA::ConcatKDF.kdf(OpenSSL::Digest::SHA256, z, [algorithm_id, new_alg.apu, new_alg.apv, supp_pub_info], key_data_len)
+      return derived_key, new_alg
     else
-      return enc.next_cek
+      return enc.next_cek, self
     end
   end
 

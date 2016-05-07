@@ -20,7 +20,7 @@ class JOSE::JWE::ALG_PBES2 < Struct.new(:hmac, :bits, :salt, :iter)
     end
     iter = nil
     if not fields.has_key?('p2c')
-      iter = 1000
+      iter = bits * 32
     elsif fields['p2c'].is_a?(Integer) and fields['p2c'] >= 0
       iter = fields['p2c']
     else
@@ -76,7 +76,7 @@ class JOSE::JWE::ALG_PBES2 < Struct.new(:hmac, :bits, :salt, :iter)
     end
     new_alg = self
     if new_alg.salt.nil?
-      new_alg = JOSE::JWE::ALG_PBES2.new(hmac, bits, wrap_salt(SecureRandom.random_bytes(8)), iter)
+      new_alg = JOSE::JWE::ALG_PBES2.new(hmac, bits, wrap_salt(SecureRandom.random_bytes(bits.div(8))), iter)
     end
     derived_key = OpenSSL::PKCS5.pbkdf2_hmac(key, new_alg.salt, new_alg.iter, new_alg.bits.div(8) + (new_alg.bits % 8), new_alg.hmac.new)
     encrypted_key = JOSE::JWA::AES_KW.wrap(decrypted_key, derived_key)
@@ -84,7 +84,7 @@ class JOSE::JWE::ALG_PBES2 < Struct.new(:hmac, :bits, :salt, :iter)
   end
 
   def next_cek(key, enc)
-    return enc.next_cek
+    return enc.next_cek, self
   end
 
   # API functions

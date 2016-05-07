@@ -47,7 +47,7 @@ class JOSE::JWE::ALG_RSA < Struct.new(:rsa_padding, :rsa_oaep_md)
   end
 
   def next_cek(key, enc)
-    return enc.next_cek
+    return enc.next_cek, self
   end
 
   # API functions

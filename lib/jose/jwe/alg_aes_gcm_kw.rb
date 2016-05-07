@@ -89,7 +89,7 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
   end
 
   def next_cek(key, enc)
-    return enc.next_cek
+    return enc.next_cek, self
   end
 
   # API functions
