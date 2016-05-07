@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0 (2016-05-07)
+
+* Enhancements
+  * [Documentation!](http://www.rubydoc.info/gems/jose) Many thanks to [@soumyaray](https://github.com/soumyaray) for the motivation to improve documentation.
+  * Support for OpenSSH octet key pairs (for Ed25519).
+  * Better key management behavior associated with ECDH-ES algorithms.
+
 ## 0.3.1 (2016-05-05)
 
 * Fixes
