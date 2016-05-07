@@ -178,6 +178,24 @@ class JOSE::JWK::KTY_EC < Struct.new(:key)
     end
   end
 
+  def verifier(fields)
+    if fields and fields['use'] == 'sig' and not fields['alg'].nil?
+      return [fields['alg']]
+    else
+      alg = case key.group.curve_name
+      when 'prime256v1', 'secp256r1'
+        'ES256'
+      when 'secp384r1'
+        'ES384'
+      when 'secp521r1'
+        'ES512'
+      else
+        raise ArgumentError, "unhandled EC curve name: #{key.group.curve_name.inspect}"
+      end
+      return [alg]
+    end
+  end
+
   def verify(message, digest_type, signature)
     n = signature.bytesize.div(2)
     r = OpenSSL::BN.new(signature[0..(n-1)], 2)

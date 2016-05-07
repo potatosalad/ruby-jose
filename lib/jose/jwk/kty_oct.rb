@@ -108,6 +108,22 @@ class JOSE::JWK::KTY_oct < Struct.new(:oct)
     end
   end
 
+  def verifier(fields)
+    if fields and fields['use'] == 'sig' and not fields['alg'].nil?
+      return [fields['alg']]
+    else
+      bitsize = (oct.bytesize * 8)
+      algs = if bitsize < 384
+        ['HS256']
+      elsif bitsize < 512
+        ['HS256', 'HS384']
+      else
+        ['HS256', 'HS384', 'HS512']
+      end
+      return algs
+    end
+  end
+
   def verify(message, digest_type, signature)
     return JOSE::JWA.constant_time_compare(signature, sign(message, digest_type))
   end

@@ -163,6 +163,14 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
     end
   end
 
+  def verifier(fields)
+    if fields and fields['use'] == 'sig' and not fields['alg'].nil?
+      return [fields['alg']]
+    else
+      return ['PS256', 'PS384', 'PS512', 'RS256', 'RS384', 'RS512']
+    end
+  end
+
   def verify(message, digest_type, signature, padding: :rsa_pkcs1_padding)
     case padding
     when :rsa_pkcs1_padding

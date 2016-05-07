@@ -94,6 +94,14 @@ class JOSE::JWK::KTY_OKP_Ed25519ph < Struct.new(:okp)
     end
   end
 
+  def verifier(fields)
+    if fields and fields['use'] == 'sig' and not fields['alg'].nil?
+      return [fields['alg']]
+    else
+      return ['Ed25519ph']
+    end
+  end
+
   def verify(message, sign_type, signature)
     raise ArgumentError, "'sign_type' must be :Ed25519ph" if sign_type != :Ed25519ph
     pk = okp

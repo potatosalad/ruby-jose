@@ -94,6 +94,14 @@ class JOSE::JWK::KTY_OKP_Ed25519 < Struct.new(:okp)
     end
   end
 
+  def verifier(fields)
+    if fields and fields['use'] == 'sig' and not fields['alg'].nil?
+      return [fields['alg']]
+    else
+      return ['Ed25519']
+    end
+  end
+
   def verify(message, digest_type, signature)
     raise ArgumentError, "'digest_type' must be :Ed25519" if digest_type != :Ed25519
     pk = okp
