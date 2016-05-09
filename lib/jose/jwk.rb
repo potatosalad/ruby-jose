@@ -597,7 +597,16 @@ module JOSE
     # @param [JOSE::EncryptedBinary, JOSE::EncryptedMap] encrypted
     # @return [[String, JOSE::JWE]]
     def self.block_decrypt(jwk, encrypted)
-      return from(jwk).block_decrypt(encrypted)
+      if jwk.is_a?(Array)
+        public_jwk, secret_jwk = from(jwk)
+        if secret_jwk.nil?
+          secret_jwk = public_jwk
+          public_jwk = nil
+        end
+        return box_decrypt(secret_jwk, encrypted, public_jwk)
+      else
+        return from(jwk).block_decrypt(encrypted)
+      end
     end
 
     # Decrypts the `encrypted` binary or map using the `jwk`.
@@ -617,7 +626,11 @@ module JOSE
     # @param [JOSE::JWE] jwe
     # @return [JOSE::EncryptedMap]
     def self.block_encrypt(jwk, plain_text, jwe = nil)
-      return from(jwk).block_encrypt(plain_text, jwe)
+      if jwk.is_a?(Array)
+        return box_encrypt(plain_text, from(jwk), jwe)
+      else
+        return from(jwk).block_encrypt(plain_text, jwe)
+      end
     end
 
     # Encrypts the `plain_text` using the `jwk` and algorithms specified by the `jwe`.
@@ -688,8 +701,8 @@ module JOSE
     # @param [JOSE::JWE] jwe
     # @return [JOSE::EncryptedMap, [JOSE::EncryptedMap, JOSE::JWK]]
     def self.box_encrypt(plain_text, box_keys, jwe = nil)
-      other_public_key, my_private_key = box_keys
-      return from(other_public_key).box_encrypt(plain_text, my_private_jwk, jwe)
+      jwk_public, jwk_secret = from(box_keys)
+      return jwk_public.box_encrypt(plain_text, jwk_secret, jwe)
     end
 
     # Key Agreement encryption of `plain_text` by generating an ephemeral private key based on `other_public_jwk` curve.
@@ -699,40 +712,49 @@ module JOSE
     # @see JOSE::JWK.box_decrypt
     # @see JOSE::JWE.block_encrypt
     # @param [String] plain_text
-    # @param [JOSE::JWK] my_private_jwk
+    # @param [JOSE::JWK] jwk_secret
     # @param [JOSE::JWE] jwe
     # @return [JOSE::EncryptedMap, [JOSE::EncryptedMap, JOSE::JWK]]
-    def box_encrypt(plain_text, my_private_jwk = nil, jwe = nil)
-      generated_jwk = nil
-      other_public_jwk = self
-      if my_private_jwk.nil?
-        generated_jwk = my_private_jwk = other_public_jwk.generate_key
+    def box_encrypt(plain_text, jwk_secret = nil, jwe = nil)
+      epk_secret = nil
+      jwk_public = self
+      if jwk_secret.nil?
+        epk_secret = jwk_secret = jwk_public.generate_key
       end
-      if not my_private_jwk.is_a?(JOSE::JWK)
-        my_private_jwk = JOSE::JWK.from(my_private_jwk)
+      if not jwk_secret.is_a?(JOSE::JWK)
+        jwk_secret = JOSE::JWK.from(jwk_secret)
       end
       if jwe.nil?
-        jwe = other_public_jwk.block_encryptor
+        jwe = jwk_public.block_encryptor
       end
       if jwe.is_a?(Hash)
         jwe = JOSE::Map.new(jwe)
       end
       if jwe.is_a?(JOSE::Map)
         if jwe['apu'].nil?
-          jwe = jwe.put('apu', my_private_jwk.fields['kid'] || my_private_jwk.thumbprint)
+          jwe = jwe.put('apu', jwk_secret.fields['kid'] || jwk_secret.thumbprint)
         end
         if jwe['apv'].nil?
-          jwe = jwe.put('apv', other_public_jwk.fields['kid'] || other_public_jwk.thumbprint)
+          jwe = jwe.put('apv', jwk_public.fields['kid'] || jwk_public.thumbprint)
         end
         if jwe['epk'].nil?
-          jwe = jwe.put('epk', my_private_jwk.to_public_map)
+          jwe = jwe.put('epk', jwk_secret.to_public_map)
         end
       end
-      if generated_jwk
-        return JOSE::JWE.block_encrypt([other_public_jwk, my_private_jwk], plain_text, jwe), generated_jwk
+      if epk_secret
+        return JOSE::JWE.block_encrypt([jwk_public, jwk_secret], plain_text, jwe), epk_secret
       else
-        return JOSE::JWE.block_encrypt([other_public_jwk, my_private_jwk], plain_text, jwe)
+        return JOSE::JWE.block_encrypt([jwk_public, jwk_secret], plain_text, jwe)
       end
+    end
+
+    # Derives a key (typically just returns a binary representation of the key).
+    #
+    # @param [JOSE::JWK] jwk
+    # @param [*Object] args
+    # @return [String]
+    def self.derive_key(jwk, *args)
+      return from(jwk).derive_key(*args)
     end
 
     # Derives a key (typically just returns a binary representation of the key).

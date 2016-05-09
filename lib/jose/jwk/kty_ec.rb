@@ -24,14 +24,14 @@ class JOSE::JWK::KTY_EC < Struct.new(:key)
       if fields['d'].is_a?(String)
         ec.private_key = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2)
       end
-      return JOSE::JWK::KTY_EC.new(ec), fields.except('kty', 'crv', 'd', 'x', 'y')
+      return JOSE::JWK::KTY_EC.new(JOSE::JWK::PKeyProxy.new(ec)), fields.except('kty', 'crv', 'd', 'x', 'y')
     else
       raise ArgumentError, "invalid 'EC' JWK"
     end
   end
 
   def to_key
-    return key
+    return key.__getobj__
   end
 
   def to_map(fields)
@@ -211,9 +211,10 @@ class JOSE::JWK::KTY_EC < Struct.new(:key)
   # API functions
 
   def self.from_key(key)
+    key = key.__getobj__ if key.is_a?(JOSE::JWK::PKeyProxy)
     case key
     when OpenSSL::PKey::EC
-      return JOSE::JWK::KTY_EC.new(key), JOSE::Map[]
+      return JOSE::JWK::KTY_EC.new(JOSE::JWK::PKeyProxy.new(key)), JOSE::Map[]
     else
       raise ArgumentError, "'key' must be a OpenSSL::PKey::EC"
     end

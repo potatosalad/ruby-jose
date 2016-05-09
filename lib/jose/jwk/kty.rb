@@ -3,6 +3,7 @@ module JOSE::JWK::KTY
   extend self
 
   def from_key(object)
+    object = object.__getobj__ if object.is_a?(JOSE::JWK::PKeyProxy)
     case object
     when OpenSSL::PKey::EC
       return JOSE::JWK::KTY_EC.from_key(object)
@@ -28,6 +29,8 @@ module JOSE::JWK::KTY
   end
 
 end
+
+require 'jose/jwk/pkey_proxy'
 
 require 'jose/jwk/kty_ec'
 require 'jose/jwk/kty_oct'

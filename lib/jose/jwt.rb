@@ -218,7 +218,7 @@ module JOSE
       plain_text = to_binary
       if jwe.nil?
         jwk = JOSE::JWK.from(jwk)
-        jwe = jwk.block_encryptor
+        jwe = (jwk.is_a?(Array) ? jwk.last : jwk).block_encryptor
       end
       if jwe.is_a?(Hash)
         jwe = JOSE::Map.new(jwe)

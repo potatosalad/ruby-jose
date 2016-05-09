@@ -17,7 +17,7 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
           rsa.p    = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['p']), 2)
           rsa.q    = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['q']), 2)
           rsa.iqmp = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['qi']), 2)
-          return JOSE::JWK::KTY_RSA.new(rsa), fields.except('kty', 'd', 'dp', 'dq', 'e', 'n', 'p', 'q', 'qi')
+          return JOSE::JWK::KTY_RSA.new(JOSE::JWK::PKeyProxy.new(rsa)), fields.except('kty', 'd', 'dp', 'dq', 'e', 'n', 'p', 'q', 'qi')
         else
           raise ArgumentError, "invalid 'RSA' JWK"
         end
@@ -25,7 +25,7 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
         rsa   = OpenSSL::PKey::RSA.new
         rsa.e = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['e']), 2)
         rsa.n = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['n']), 2)
-        return JOSE::JWK::KTY_RSA.new(rsa), fields.except('kty', 'e', 'n')
+        return JOSE::JWK::KTY_RSA.new(JOSE::JWK::PKeyProxy.new(rsa)), fields.except('kty', 'e', 'n')
       end
     else
       raise ArgumentError, "invalid 'RSA' JWK"
@@ -33,7 +33,7 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
   end
 
   def to_key
-    return key
+    return key.__getobj__
   end
 
   def to_map(fields)
@@ -187,9 +187,10 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
   # API functions
 
   def self.from_key(key)
+    key = key.__getobj__ if key.is_a?(JOSE::JWK::PKeyProxy)
     case key
     when OpenSSL::PKey::RSA
-      return JOSE::JWK::KTY_RSA.new(key), JOSE::Map[]
+      return JOSE::JWK::KTY_RSA.new(JOSE::JWK::PKeyProxy.new(key)), JOSE::Map[]
     else
       raise ArgumentError, "'key' must be a OpenSSL::PKey::RSA"
     end
