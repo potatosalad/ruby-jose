@@ -13,3 +13,6 @@ ENV['RANTLY_VERBOSE'] ||= '0'
 require File.expand_path('../rantly_extensions', __FILE__)
 
 require 'minitest/autorun'
+if ENV['FOCUS']
+  require 'minitest/focus'
+end

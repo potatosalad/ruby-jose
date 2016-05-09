@@ -880,12 +880,16 @@ module JOSE
     # Signs the `plain_text` using the `jwk` and the default signer algorithm `jws` for the key type.
     #
     # @see JOSE::JWS.sign
-    # @param [JOSE::JWK] jwk
     # @param [String] plain_text
     # @param [JOSE::JWS] jws
+    # @param [JOSE::JWK] jwk
     # @param [JOSE::Map] header
     # @return [JOSE::SignedMap]
-    def self.sign(jwk, plain_text, jws = nil, header = nil)
+    def self.sign(plain_text, jws, jwk = nil, header = nil)
+      if jwk.nil?
+        jwk = jws
+        jws = nil
+      end
       return from(jwk).sign(plain_text, jws, header)
     end
 

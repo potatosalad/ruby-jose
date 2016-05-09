@@ -316,7 +316,7 @@ module JOSE
       if not jws.has_key?('typ')
         jws = jws.put('typ', 'JWT')
       end
-      return JOSE::JWK.sign(jwk, plain_text, jws, header)
+      return JOSE::JWK.sign(plain_text, jws, jwk, header)
     end
 
     # Verifies the `signed` using the `jwk` and calls {JOSE::JWT.from JOST::JWT.from} on the payload.
