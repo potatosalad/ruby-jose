@@ -106,7 +106,7 @@ class JOSE::JWA::FieldElement
   end
 
   def sign
-    return @x%2
+    return @x % 2.to_bn
   end
 
   def value
