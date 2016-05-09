@@ -4,6 +4,7 @@ require 'base64'
 require 'hamster/hash'
 require 'json'
 require 'openssl'
+require 'securerandom'
 require 'thread'
 
 # JOSE stands for JSON Object Signing and Encryption which is a is a set of
