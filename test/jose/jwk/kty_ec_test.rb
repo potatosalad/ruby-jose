@@ -1,17 +1,12 @@
 require 'test_helper'
 
-class JOSE::JWK::KTY_OKP_X25519Test < Minitest::Test
+class JOSE::JWK::KTY_OKP_ECTest < Minitest::Test
 
-  SECRET_JWK_JSON = "{\"crv\":\"X25519\",\"d\":\"OI532y8BG4-umYqGQmupBzg-57lKhhqpLLW53oAp_00\",\"kty\":\"OKP\",\"x\":\"93I7RqdTXgX-FOMPTFwFkNUdBiUoJtKysfbNAYGreFs\"}"
-  PUBLIC_JWK_JSON = "{\"crv\":\"X25519\",\"kty\":\"OKP\",\"x\":\"93I7RqdTXgX-FOMPTFwFkNUdBiUoJtKysfbNAYGreFs\"}"
-  SECRET_EPK_JSON = "{\"crv\":\"X25519\",\"d\":\"CEjIwWcdyB-vadyLXk6oZtvvtFzPyYBItgQsNH9GiHo\",\"kty\":\"OKP\",\"x\":\"Kq1z0YBxOC5T7BZl6BipGhN7H8apYXYaqHqs702Q1TQ\"}"
-  PUBLIC_EPK_JSON = "{\"crv\":\"X25519\",\"kty\":\"OKP\",\"x\":\"Kq1z0YBxOC5T7BZl6BipGhN7H8apYXYaqHqs702Q1TQ\"}"
-  SHARED_SECRET   = [18,17,51,28,226,44,56,26,238,5,212,191,218,27,102,223,32,230,177,84,68,239,76,112,137,253,100,82,203,132,76,100].pack('C*')
-
-  def test_generate_key
-    jwk_secret = JOSE::JWK.generate_key([:okp, :X25519])
-    refute_equal JOSE::JWK.thumbprint(jwk_secret), JOSE::JWK.thumbprint(JOSE::JWK.generate_key(jwk_secret))
-  end
+  SECRET_JWK_JSON = "{\"crv\":\"P-256\",\"d\":\"8JrNI9OsOICTQ-AvjrqaKcLTpqzvTSzDzaTPEIgfSlQ\",\"kty\":\"EC\",\"x\":\"sc4IAHTm5VXohRMrwfDHp43xD3FndACOL-T-dNVxIB0\",\"y\":\"d3UCc6S4Zl_7Ngfx7OmMtF1WFVQflmTOE6T5Xg7mnLw\"}"
+  PUBLIC_JWK_JSON = "{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"sc4IAHTm5VXohRMrwfDHp43xD3FndACOL-T-dNVxIB0\",\"y\":\"d3UCc6S4Zl_7Ngfx7OmMtF1WFVQflmTOE6T5Xg7mnLw\"}"
+  SECRET_EPK_JSON = "{\"crv\":\"P-256\",\"d\":\"zWN7--gWPzBWw0TMJlU5Vircjkk_RKJTl9NVDpLvwk4\",\"kty\":\"EC\",\"x\":\"ACiE6kNmjcATszoFzvacvj3UQ1OA5wJOTmKAZE6RRoQ\",\"y\":\"Tgnxw82hFJl968ALk5rgROxjfgUY7z4k4SY7t0gfdII\"}"
+  PUBLIC_EPK_JSON = "{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"ACiE6kNmjcATszoFzvacvj3UQ1OA5wJOTmKAZE6RRoQ\",\"y\":\"Tgnxw82hFJl968ALk5rgROxjfgUY7z4k4SY7t0gfdII\"}"
+  SHARED_SECRET   = [227,91,164,154,84,202,40,57,45,214,16,63,15,2,252,73,41,118,240,14,56,101,12,66,84,41,99,224,48,131,11,210].pack('C*')
 
   def test_from_binary_and_to_binary
     secret_jwk = JOSE::JWK.from_binary(SECRET_JWK_JSON)
@@ -31,7 +26,7 @@ class JOSE::JWK::KTY_OKP_X25519Test < Minitest::Test
   end
 
   def test_block_encryptor
-    plain_jwk = JOSE::JWK.from_binary(SECRET_JWK_JSON)
+    plain_jwk = JOSE::JWK.generate_key([:ec, 'P-256'])
     assert_equal JOSE::Map['alg' => 'ECDH-ES', 'enc' => 'A128GCM'], JOSE::JWK.block_encryptor(plain_jwk)
     apu = SecureRandom.urlsafe_base64(8)
     apv = SecureRandom.urlsafe_base64(8)
@@ -51,15 +46,6 @@ class JOSE::JWK::KTY_OKP_X25519Test < Minitest::Test
       'enc' => 'A128GCM',
       'epk' => epk
     ], JOSE::JWK.block_encryptor(extra_jwk))
-  end
-
-  def test_property_of_to_openssh_key_and_from_openssh_key
-    property_of {
-      gen_jwk_kty_okp(:X25519)
-    }.check { |tuple|
-      jwk_secret = tuple[0]
-      assert_equal jwk_secret, JOSE::JWK.from_openssh_key(JOSE::JWK.to_openssh_key(jwk_secret))
-    }
   end
 
 end

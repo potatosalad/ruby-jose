@@ -84,7 +84,9 @@ class JOSE::JWATest < Minitest::Test
           ]
         }
       }
-      assert_equal supported, JOSE::JWA.supports
+      RSAGenerator.cache do
+        assert_equal supported, JOSE::JWA.supports
+      end
     ensure
       JOSE.crypto_fallback = crypto_fallback
       JOSE.unsecured_signing = unsecured_signing

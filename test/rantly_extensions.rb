@@ -109,8 +109,8 @@ class Rantly
       JWS_ALG_GROUPS.values_at(*groups).flatten.compact
     end
     raise ArgumentError, "'groups' may be of #{JWS_ALG_GROUPS.keys.map(&:inspect).join(', ')}" if options.empty?
-    # RSA PKCS#1.5 and PSS operations are slower, so let's restrict the probability they get chosen.
-    options_faster = options.clone.delete_if { |option| option.start_with?('PS') or option.start_with?('RS') }
+    # Ed448, Ed448ph, RSA PKCS#1.5, and PSS operations are slower, so let's restrict the probability they get chosen.
+    options_faster = options.clone.delete_if { |option| option.start_with?('Ed448') or option.start_with?('PS') or option.start_with?('RS') }
     return freq(
       [10, :choose, *options_faster],
       [ 1, :choose, *options]
@@ -144,7 +144,9 @@ class Rantly
   end
 
   def gen_jwk_kty_rsa(modulus_size = self.choose(2048, 4096))
-    jwk_secret = JOSE::JWK.generate_key([:rsa, modulus_size])
+    jwk_secret = RSAGenerator.cache do
+      JOSE::JWK.generate_key([:rsa, modulus_size])
+    end
     jwk_public = JOSE::JWK.to_public(jwk_secret)
     return Tuple.new([jwk_secret, jwk_public])
   end
@@ -158,10 +160,12 @@ class Rantly
         [1, :gen_jwk_kty_okp, *choose(:X25519, :X448)]
       )[1].to_map
     end
-    jwk_secret = JOSE::JWE.generate_key(extra.merge({
-      'alg' => alg,
-      'enc' => enc
-    }))
+    jwk_secret = RSAGenerator.cache do
+      JOSE::JWE.generate_key(extra.merge({
+        'alg' => alg,
+        'enc' => enc
+      }))
+    end
     jwk_public = JOSE::JWK.to_public(jwk_secret)
     if alg.start_with?('ECDH')
       epk_secret = JOSE::JWE.generate_key(extra.merge({
@@ -177,9 +181,11 @@ class Rantly
 
   def gen_jwk_use_sig(alg = self.choose_jws_alg, extra = {})
     alg = choose_jws_alg(*alg) if alg.is_a?(Symbol) or (alg.is_a?(Array) and alg.all? { |i| i.is_a?(Symbol) })
-    jwk_secret = JOSE::JWS.generate_key(extra.merge({
-      'alg' => alg
-    }))
+    jwk_secret = RSAGenerator.cache do
+      JOSE::JWS.generate_key(extra.merge({
+        'alg' => alg
+      }))
+    end
     jwk_public = JOSE::JWK.to_public(jwk_secret)
     return Tuple.new([jwk_secret, jwk_public])
   end

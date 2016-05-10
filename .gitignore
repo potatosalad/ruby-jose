@@ -1,4 +1,5 @@
 /.bundle/
+/.minitest-perf.db
 /.yardoc
 /Gemfile.lock
 /_yardoc/

@@ -1,8 +1,13 @@
 module JOSE::JWE::ALG
 
-  extend self
-
-  def generate_key(parameters, algorithm, encryption)
+  # Generates a new {JOSE::JWK JOSE::JWK} based on the `parameters`, `algorithm`, and `encryption`.
+  #
+  # @see JOSE::JWK.generate_key
+  # @param [Array] parameters
+  # @param [String] algorithm
+  # @param [String] encryption
+  # @return [JOSE::JWK]
+  def self.generate_key(parameters, algorithm, encryption)
     return JOSE::JWK.generate_key(parameters).merge({
       'alg' => algorithm,
       'enc' => encryption,

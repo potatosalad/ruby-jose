@@ -130,20 +130,21 @@ module JOSE
   # @param [String] binary
   # @return [String]
   def self.urlsafe_decode64(binary)
+    binary = binary.tr('-_', '+/')
     case binary.bytesize % 4
     when 2
       binary += '=='
     when 3
       binary += '='
     end
-    return Base64.urlsafe_decode64(binary)
+    return Base64.decode64(binary)
   end
 
   # Returns the Base64Url encoded version of `binary` without padding.
   # @param [String] binary
   # @return [String]
   def self.urlsafe_encode64(binary)
-    return Base64.urlsafe_encode64(binary).tr('=', '')
+    return Base64.strict_encode64(binary).tr('+/', '-_').delete('=')
   end
 
 private

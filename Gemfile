@@ -11,6 +11,7 @@ end
 
 group :test do
   gem 'minitest-focus', require: false
+  gem 'minitest-perf', require: false
   gem 'rantly', github: 'abargnesi/rantly', ref: '4d219ea3eb340a5153a43d051b2e22ccb2bce274', require: false
   gem 'simplecov', require: false
   if ENV['CI']
