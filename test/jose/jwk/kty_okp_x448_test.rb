@@ -68,4 +68,10 @@ class JOSE::JWK::KTY_OKP_X448Test < Minitest::Test
     # }
   end
 
+  def test_key_encryptor
+    secret_jwk = JOSE::JWK.from_binary(SECRET_JWK_JSON)
+    key_encryptor = secret_jwk.kty.key_encryptor(secret_jwk.fields, 'test')
+    assert_equal 'PBES2-HS256+A128KW', key_encryptor['alg']
+  end
+
 end

@@ -53,4 +53,26 @@ class JOSE::JWK::KTY_OKP_Ed448Test < Minitest::Test
     # }
   end
 
+  def test_signer
+    plain_jwk = JOSE::JWK.from(SECRET_JWK_JSON)
+    assert_equal JOSE::Map['alg' => 'Ed448'], JOSE::JWK.signer(plain_jwk)
+    extra_jwk = plain_jwk.merge({'alg' => 'Ed448', 'use' => 'sig'})
+    assert_equal JOSE::Map['alg' => 'Ed448'], JOSE::JWK.signer(extra_jwk)
+    public_jwk = JOSE::JWK.from(PUBLIC_JWK_JSON)
+    assert_raises(ArgumentError) { JOSE::JWK.signer(public_jwk) }
+  end
+
+  def test_verifier
+    plain_jwk = JOSE::JWK.from(SECRET_JWK_JSON)
+    assert_equal ['Ed448'], JOSE::JWK.verifier(plain_jwk)
+    extra_jwk = plain_jwk.merge({'alg' => 'Ed448', 'use' => 'sig'})
+    assert_equal ['Ed448'], JOSE::JWK.verifier(extra_jwk)
+  end
+
+  def test_key_encryptor
+    secret_jwk = JOSE::JWK.from_binary(SECRET_JWK_JSON)
+    key_encryptor = secret_jwk.kty.key_encryptor(secret_jwk.fields, 'test')
+    assert_equal 'PBES2-HS256+A128KW', key_encryptor['alg']
+  end
+
 end

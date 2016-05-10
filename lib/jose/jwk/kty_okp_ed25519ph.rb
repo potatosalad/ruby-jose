@@ -134,7 +134,7 @@ class JOSE::JWK::KTY_OKP_Ed25519ph < Struct.new(:okp)
   end
 
   def to_okp
-    return [:Ed25519, okp]
+    return [:Ed25519ph, okp]
   end
 
   def to_openssh_key(fields)

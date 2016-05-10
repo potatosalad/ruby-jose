@@ -61,6 +61,28 @@ class JOSE::JWK::KTY_octTest < Minitest::Test
     assert_raises(ArgumentError) { JOSE::JWK.generate_key([:oct, 1.0]) }
   end
 
+  def test_signer
+    oct256_jwk = JOSE::JWK.generate_key([:oct, 32])
+    oct384_jwk = JOSE::JWK.generate_key([:oct, 48])
+    oct512_jwk = JOSE::JWK.generate_key([:oct, 64])
+    assert_equal JOSE::Map['alg' => 'HS256'], JOSE::JWK.signer(oct256_jwk)
+    assert_equal JOSE::Map['alg' => 'HS384'], JOSE::JWK.signer(oct384_jwk)
+    assert_equal JOSE::Map['alg' => 'HS512'], JOSE::JWK.signer(oct512_jwk)
+    extra_oct256_jwk = oct256_jwk.merge({'alg' => 'HS512', 'use' => 'sig'})
+    assert_equal JOSE::Map['alg' => 'HS512'], JOSE::JWK.signer(extra_oct256_jwk)
+  end
+
+  def test_verifier
+    oct256_jwk = JOSE::JWK.generate_key([:oct, 32])
+    oct384_jwk = JOSE::JWK.generate_key([:oct, 48])
+    oct512_jwk = JOSE::JWK.generate_key([:oct, 64])
+    assert_equal ['HS256'], JOSE::JWK.verifier(oct256_jwk)
+    assert_equal ['HS256', 'HS384'], JOSE::JWK.verifier(oct384_jwk)
+    assert_equal ['HS256', 'HS384', 'HS512'], JOSE::JWK.verifier(oct512_jwk)
+    extra_oct256_jwk = oct256_jwk.merge({'alg' => 'HS512', 'use' => 'sig'})
+    assert_equal ['HS512'], JOSE::JWK.verifier(extra_oct256_jwk)
+  end
+
   def test_key_encryptor
     secret_jwk = JOSE::JWK.from_binary(SECRET_JWK_JSON)
     key_encryptor = secret_jwk.kty.key_encryptor(secret_jwk.fields, 'test')

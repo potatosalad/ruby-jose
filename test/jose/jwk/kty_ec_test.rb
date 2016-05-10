@@ -48,4 +48,34 @@ class JOSE::JWK::KTY_OKP_ECTest < Minitest::Test
     ], JOSE::JWK.block_encryptor(extra_jwk))
   end
 
+  def test_signer
+    ec_p256_jwk = JOSE::JWK.generate_key([:ec, 'P-256'])
+    ec_p384_jwk = JOSE::JWK.generate_key([:ec, 'P-384'])
+    ec_p521_jwk = JOSE::JWK.generate_key([:ec, 'P-521'])
+    assert_equal JOSE::Map['alg' => 'ES256'], JOSE::JWK.signer(ec_p256_jwk)
+    assert_equal JOSE::Map['alg' => 'ES384'], JOSE::JWK.signer(ec_p384_jwk)
+    assert_equal JOSE::Map['alg' => 'ES512'], JOSE::JWK.signer(ec_p521_jwk)
+    extra_ec_p256_jwk = ec_p256_jwk.merge({'alg' => 'ES256', 'use' => 'sig'})
+    assert_equal JOSE::Map['alg' => 'ES256'], JOSE::JWK.signer(extra_ec_p256_jwk)
+    public_ec_p256_jwk = JOSE::JWK.to_public(ec_p256_jwk)
+    assert_raises(ArgumentError) { JOSE::JWK.signer(public_ec_p256_jwk) }
+  end
+
+  def test_verifier
+    ec_p256_jwk = JOSE::JWK.generate_key([:ec, 'P-256'])
+    ec_p384_jwk = JOSE::JWK.generate_key([:ec, 'P-384'])
+    ec_p521_jwk = JOSE::JWK.generate_key([:ec, 'P-521'])
+    assert_equal ['ES256'], JOSE::JWK.verifier(ec_p256_jwk)
+    assert_equal ['ES384'], JOSE::JWK.verifier(ec_p384_jwk)
+    assert_equal ['ES512'], JOSE::JWK.verifier(ec_p521_jwk)
+    extra_ec_p256_jwk = ec_p256_jwk.merge({'alg' => 'ES256', 'use' => 'sig'})
+    assert_equal ['ES256'], JOSE::JWK.verifier(extra_ec_p256_jwk)
+  end
+
+  def test_key_encryptor
+    secret_jwk = JOSE::JWK.from_binary(SECRET_JWK_JSON)
+    key_encryptor = secret_jwk.kty.key_encryptor(secret_jwk.fields, 'test')
+    assert_equal 'PBES2-HS256+A128KW', key_encryptor['alg']
+  end
+
 end

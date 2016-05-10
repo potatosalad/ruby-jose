@@ -2,6 +2,9 @@ require 'test_helper'
 
 class JOSE::JWK::KTY_OKP_Ed25519Test < Minitest::Test
 
+  SECRET_JWK_JSON = "{\"crv\":\"Ed25519\",\"d\":\"TghhpzoRLQXOLyyN1GN0ft-TPS0ZYnS_QmRkgLUU5n0\",\"kty\":\"OKP\",\"x\":\"h3eN6RqbqjO24jScv4PirOtJGq-P0qECYA7MdbwFo2o\"}"
+  PUBLIC_JWK_JSON = "{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"h3eN6RqbqjO24jScv4PirOtJGq-P0qECYA7MdbwFo2o\"}"
+
   def test_generate_key
     jwk_secret = JOSE::JWK.generate_key([:okp, :Ed25519])
     refute_equal JOSE::JWK.thumbprint(jwk_secret), JOSE::JWK.thumbprint(JOSE::JWK.generate_key(jwk_secret))
@@ -31,6 +34,28 @@ class JOSE::JWK::KTY_OKP_Ed25519Test < Minitest::Test
       jwk_secret = tuple[0]
       assert_equal jwk_secret, JOSE::JWK.from_openssh_key(JOSE::JWK.to_openssh_key(jwk_secret))
     }
+  end
+
+  def test_signer
+    plain_jwk = JOSE::JWK.from(SECRET_JWK_JSON)
+    assert_equal JOSE::Map['alg' => 'Ed25519'], JOSE::JWK.signer(plain_jwk)
+    extra_jwk = plain_jwk.merge({'alg' => 'Ed25519', 'use' => 'sig'})
+    assert_equal JOSE::Map['alg' => 'Ed25519'], JOSE::JWK.signer(extra_jwk)
+    public_jwk = JOSE::JWK.from(PUBLIC_JWK_JSON)
+    assert_raises(ArgumentError) { JOSE::JWK.signer(public_jwk) }
+  end
+
+  def test_verifier
+    plain_jwk = JOSE::JWK.from(SECRET_JWK_JSON)
+    assert_equal ['Ed25519'], JOSE::JWK.verifier(plain_jwk)
+    extra_jwk = plain_jwk.merge({'alg' => 'Ed25519', 'use' => 'sig'})
+    assert_equal ['Ed25519'], JOSE::JWK.verifier(extra_jwk)
+  end
+
+  def test_key_encryptor
+    secret_jwk = JOSE::JWK.from_binary(SECRET_JWK_JSON)
+    key_encryptor = secret_jwk.kty.key_encryptor(secret_jwk.fields, 'test')
+    assert_equal 'PBES2-HS256+A128KW', key_encryptor['alg']
   end
 
 end
