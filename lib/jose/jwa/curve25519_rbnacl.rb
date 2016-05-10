@@ -51,15 +51,15 @@ module JOSE::JWA::Curve25519_RbNaCl
   end
 
   def x25519_keypair(secret = nil)
-    return JOSE::JWA::X25519.keypair(secret)
+    return JOSE::JWA::X25519_RbNaCl.keypair(secret)
   end
 
   def x25519_secret_to_public(sk)
-    return JOSE::JWA::X25519.sk_to_pk(sk)
+    return JOSE::JWA::X25519_RbNaCl.sk_to_pk(sk)
   end
 
   def x25519_shared_secret(pk, sk)
-    return JOSE::JWA::X25519.shared_secret(pk, sk)
+    return JOSE::JWA::X25519_RbNaCl.shared_secret(pk, sk)
   end
 
 end
