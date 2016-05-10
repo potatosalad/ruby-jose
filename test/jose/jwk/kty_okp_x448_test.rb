@@ -60,12 +60,12 @@ class JOSE::JWK::KTY_OKP_X448Test < Minitest::Test
 
   def test_property_of_to_openssh_key_and_from_openssh_key
     skip("Very slow, needs to be implemented in C.")
-    property_of {
-      gen_jwk_kty_okp(:X448)
-    }.check { |tuple|
-      jwk_secret = tuple[0]
-      assert_equal jwk_secret, JOSE::JWK.from_openssh_key(JOSE::JWK.to_openssh_key(jwk_secret))
-    }
+    # property_of {
+    #   gen_jwk_kty_okp(:X448)
+    # }.check { |tuple|
+    #   jwk_secret = tuple[0]
+    #   assert_equal jwk_secret, JOSE::JWK.from_openssh_key(JOSE::JWK.to_openssh_key(jwk_secret))
+    # }
   end
 
 end

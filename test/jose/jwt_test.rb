@@ -2,12 +2,17 @@ require 'test_helper'
 
 class JOSE::JWTTest < Minitest::Test
 
-  def test_property_of_from_map_and_to_map
+  def test_property_of_from
     property_of {
       urlsafe_base64_dict
-    }.check { |jwt_map|
-      jwt = JOSE::JWT.from_map(jwt_map)
-      assert_equal jwt_map, JOSE::JWT.to_map(jwt)
+    }.check { |object|
+      jwt = JOSE::JWT.from(object)
+      jwt_binary = JOSE::JWT.to_binary(jwt)
+      jwt_map = JOSE::JWT.to_map(jwt)
+      assert_equal jwt, JOSE::JWT.from(jwt)
+      assert_equal jwt, JOSE::JWT.from(jwt_binary)
+      assert_equal jwt, JOSE::JWT.from(jwt_map)
+      assert_equal [jwt, jwt, jwt], JOSE::JWT.from([jwt, jwt_binary, jwt_map])
     }
   end
 
