@@ -25,4 +25,27 @@ class JOSE::JWK::KTY_OKP_X448Test < Minitest::Test
     assert_equal SHARED_SECRET, JOSE::JWK.shared_secret(public_epk, secret_jwk)
   end
 
+  def test_block_encryptor
+    plain_jwk = JOSE::JWK.generate_key([:okp, :X448])
+    assert_equal JOSE::Map['alg' => 'ECDH-ES', 'enc' => 'A128GCM'], JOSE::JWK.block_encryptor(plain_jwk)
+    apu = SecureRandom.urlsafe_base64(8)
+    apv = SecureRandom.urlsafe_base64(8)
+    epk = plain_jwk.to_public.to_map
+    extra_jwk = plain_jwk.merge({
+      'alg' => 'ECDH-ES',
+      'apu' => apu,
+      'apv' => apv,
+      'enc' => 'A128GCM',
+      'epk' => epk,
+      'use' => 'enc'
+    })
+    assert_equal(JOSE::Map[
+      'alg' => 'ECDH-ES',
+      'apu' => apu,
+      'apv' => apv,
+      'enc' => 'A128GCM',
+      'epk' => epk
+    ], JOSE::JWK.block_encryptor(extra_jwk))
+  end
+
 end

@@ -5,15 +5,13 @@ module JOSE::JWA::Ed448
   C_bits = 456
   C_bytes = (C_bits + 7) / 8
   C_secretbytes = C_bytes
-  C_legacysecretbytes = 32
   C_publickeybytes = C_bytes
   C_secretkeybytes = C_secretbytes + C_publickeybytes
-  C_legacysecretkeybytes = C_legacysecretbytes + C_publickeybytes
   C_signaturebytes = C_bytes + C_bytes
   C_B = JOSE::JWA::Edwards448Point.stdbase.freeze
 
   def secret_to_curve448(secret)
-    raise ArgumentError, "secret must be #{C_secretbytes} bytes" if secret.bytesize != C_secretbytes and secret.bytesize != C_legacysecretbytes
+    raise ArgumentError, "secret must be #{C_secretbytes} bytes" if secret.bytesize != C_secretbytes
     curve448_scalar = JOSE::JWA::SHA3.shake256(secret, 114)[0, 56]
     curve448_scalar.setbyte(0, curve448_scalar.getbyte(0) & 252)
     curve448_scalar.setbyte(55, curve448_scalar.getbyte(55) | 128)
@@ -21,7 +19,7 @@ module JOSE::JWA::Ed448
   end
 
   def secret_to_pk(secret)
-    raise ArgumentError, "secret must be #{C_secretbytes} bytes" if secret.bytesize != C_secretbytes and secret.bytesize != C_legacysecretbytes
+    raise ArgumentError, "secret must be #{C_secretbytes} bytes" if secret.bytesize != C_secretbytes
     return (C_B * OpenSSL::BN.new(secret_to_curve448(secret).reverse, 2).to_i).encode()
   end
 
@@ -34,13 +32,11 @@ module JOSE::JWA::Ed448
 
   def sk_to_secret(sk)
     return sk[0, C_secretbytes] if sk.bytesize == C_secretkeybytes
-    return sk[0, C_legacysecretbytes] if sk.bytesize == C_legacysecretkeybytes
     raise ArgumentError, "sk must be #{C_secretkeybytes} bytes"
   end
 
   def sk_to_pk(sk)
     return sk[C_secretbytes, C_secretkeybytes] if sk.bytesize == C_secretkeybytes
-    return sk[C_legacysecretbytes, C_legacysecretkeybytes] if sk.bytesize == C_legacysecretkeybytes
     raise ArgumentError, "sk must be #{C_secretkeybytes} bytes"
   end
 
@@ -56,14 +52,12 @@ module JOSE::JWA::Ed448
   end
 
   def sign(m, sk, ctx = nil)
-    raise ArgumentError, "sk must be #{C_secretkeybytes} bytes" if sk.bytesize != C_secretkeybytes and sk.bytesize != C_legacysecretkeybytes
+    raise ArgumentError, "sk must be #{C_secretkeybytes} bytes" if sk.bytesize != C_secretkeybytes
     ctx ||= ''
     raise ArgumentError, "ctx must be 255 bytes or smaller" if ctx.bytesize > 255
     secret, pk = nil, nil
     if sk.bytesize == C_secretkeybytes
       secret, pk = sk[0, 57], sk[57, 114]
-    elsif sk.bytesize == C_legacysecretkeybytes
-      secret, pk = sk[0, 32], sk[32, 89]
     end
     khash = JOSE::JWA::SHA3.shake256(secret, 114)
     curve448_scalar, seed = khash[0, 57], khash[57, 114]
@@ -83,15 +77,13 @@ module JOSE::JWA::Ed448
   end
 
   def sign_ph(m, sk, ctx = nil)
-    raise ArgumentError, "sk must be #{C_secretkeybytes} bytes" if sk.bytesize != C_secretkeybytes and sk.bytesize != C_legacysecretkeybytes
+    raise ArgumentError, "sk must be #{C_secretkeybytes} bytes" if sk.bytesize != C_secretkeybytes
     ctx ||= ''
     raise ArgumentError, "ctx must be 255 bytes or smaller" if ctx.bytesize > 255
     m = JOSE::JWA::SHA3.shake256(['SigEd448', 2, ctx.bytesize, ctx, m].pack('a*CCa*a*'), 64)
     secret, pk = nil, nil
     if sk.bytesize == C_secretkeybytes
       secret, pk = sk[0, 57], sk[57, 114]
-    elsif sk.bytesize == C_legacysecretkeybytes
-      secret, pk = sk[0, 32], sk[32, 89]
     end
     khash = JOSE::JWA::SHA3.shake256(secret, 114)
     curve448_scalar, seed = khash[0, 57], khash[57, 114]

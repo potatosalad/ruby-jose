@@ -115,27 +115,15 @@ class Rantly
       [10, :choose, *options_faster],
       [ 1, :choose, *options]
     )
-    return choose(*options)
   end
 
-  def gen_jwk(key_type = nil, *args)
-    case key_type
-    when :ec
-      return gen_jwk_kty_ec(*args)
-    when :oct
-      return gen_jwk_kty_oct(*args)
-    when :okp
-      return gen_jwk_kty_okp(*args)
-    when :rsa
-      return gen_jwk_kty_rsa(*args)
-    else
-      return freq(
-        [10, :gen_jwk_kty_ec],
-        [50, :gen_jwk_kty_oct],
-        [10, :gen_jwk_kty_okp],
-        [ 1, :gen_jwk_kty_rsa]
-      )
-    end
+  def gen_jwk
+    return freq(
+      [10, :gen_jwk_kty_ec],
+      [50, :gen_jwk_kty_oct],
+      [10, :gen_jwk_kty_okp],
+      [ 1, :gen_jwk_kty_rsa]
+    )
   end
 
   def gen_jwk_kty_ec(curve_name = self.choose('P-256', 'P-384', 'P-521'))
