@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0 (2016-05-10)
+
+* Enhancements
+  * Test coverage is now slightly above 90%.
+  * Removed legacy support for 32-byte Ed448 and Ed448ph secret keys.
+  * Improved behavior of ECDH-ES encryption.
+
+* Fixes
+  * X25519 uses RbNaCl when available.
+  * Various argument order fixes.
+
 ## 1.0.0 (2016-05-07)
 
 * Enhancements
