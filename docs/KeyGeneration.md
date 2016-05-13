@@ -127,7 +127,7 @@ jwk_oct64 = JOSE::JWE.generate_key({"alg" => "dir", "enc" => "A256CBC-HS512"})
 
 ### Method 4
 
-If you have a JWS header with an `"alg"` field that requires a symmetric key, a new `oct` key will be generated based on the byte size recommended for `"alg".
+If you have a JWS header with an `"alg"` field that requires a symmetric key, a new `oct` key will be generated based on the byte size recommended for `"alg"`.
 
 ```ruby
 jwk_oct32 = JOSE::JWS.generate_key({"alg" => "HS256"})
