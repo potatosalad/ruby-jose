@@ -16,6 +16,15 @@ class JOSE::JWK::KTY_OKP_ECTest < Minitest::Test
     assert_equal public_jwk,      JOSE::JWK.to_public(secret_jwk)
   end
 
+  def test_from_key_and_to_key
+    secret_jwk = JOSE::JWK.from_binary(SECRET_JWK_JSON)
+    public_jwk = JOSE::JWK.from_binary(PUBLIC_JWK_JSON)
+    secret_key = JOSE::JWK.to_key(secret_jwk)
+    public_key = JOSE::JWK.to_key(public_jwk)
+    assert_equal secret_jwk, JOSE::JWK.from_key(secret_key)
+    assert_equal public_jwk, JOSE::JWK.from_key(public_key)
+  end
+
   def test_shared_secret
     secret_jwk = JOSE::JWK.from_binary(SECRET_JWK_JSON)
     public_jwk = JOSE::JWK.from_binary(PUBLIC_JWK_JSON)

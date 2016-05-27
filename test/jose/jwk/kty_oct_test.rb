@@ -27,6 +27,7 @@ class JOSE::JWK::KTY_octTest < Minitest::Test
   def test_to_oct
     secret_jwk = JOSE::JWK.from_binary(SECRET_JWK_JSON)
     assert_equal SECRET_OCT_DATA, JOSE::JWK.to_oct(secret_jwk)
+    assert_equal secret_jwk, JOSE::JWK.from_oct(SECRET_OCT_DATA)
   end
 
   def test_thumbprint

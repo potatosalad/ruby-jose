@@ -10,6 +10,8 @@ if ENV['COVERAGE']
   SimpleCov.start
 end
 
+require 'tempfile'
+
 ENV['JOSE_CRYPTO_FALLBACK'] ||= '1'
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'jose'

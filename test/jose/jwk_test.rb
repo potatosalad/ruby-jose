@@ -23,6 +23,47 @@ class JOSE::JWKTest < Minitest::Test
     }
   end
 
+  def test_from
+    assert_raises(ArgumentError) { JOSE::JWK.from(1) }
+  end
+
+  def test_from_binary
+    jwk1 = JOSE::JWK.generate_key([:oct, 1])
+    jwk2 = JOSE::JWK.generate_key([:oct, 2])
+    binary_array = [
+      jwk1.to_binary,
+      jwk2.to_binary
+    ]
+    jwks = JOSE::JWK.from_binary(binary_array)
+    assert_equal jwk1, jwks[0]
+    assert_equal jwk2, jwks[1]
+    assert_raises(ArgumentError) { JOSE::JWK.from_binary(1) }
+  end
+
+  def test_from_file_and_to_file
+    tempfile = Tempfile.new('jwk')
+    begin
+      jwk_oct = JOSE::JWK.generate_key([:oct, 1])
+      JOSE::JWK.to_file(jwk_oct, tempfile.path)
+      assert_equal jwk_oct, JOSE::JWK.from_file(tempfile.path)
+      JOSE::JWK.to_oct_file(jwk_oct, tempfile.path)
+      assert_equal jwk_oct, JOSE::JWK.from_oct_file(tempfile.path)
+      jwk_ed25519 = JOSE::JWK.generate_key([:okp, :Ed25519])
+      JOSE::JWK.to_openssh_key_file(jwk_ed25519, tempfile.path)
+      assert_equal jwk_ed25519, JOSE::JWK.from_openssh_key_file(tempfile.path)
+      jwk_ec256_secret = JOSE::JWK.generate_key([:ec, "P-256"])
+      jwk_ec256_public = JOSE::JWK.to_public(jwk_ec256_secret)
+      JOSE::JWK.to_pem_file(jwk_ec256_secret, tempfile.path)
+      assert_equal jwk_ec256_secret, JOSE::JWK.from_pem_file(tempfile.path)
+      JOSE::JWK.to_public_file(jwk_ec256_secret, tempfile.path)
+      assert_equal jwk_ec256_public, JOSE::JWK.from_file(tempfile.path)
+      JOSE::JWK.to_pem_file(jwk_ec256_public, tempfile.path)
+      assert_equal jwk_ec256_public, JOSE::JWK.from_pem_file(tempfile.path)
+    ensure
+      tempfile.unlink
+    end
+  end
+
   def test_from_okp_and_to_okp
     okp_vectors = [
       [:Ed25519,   [77,55,145,129,165,187,226,143,188,140,61,104,87,201,145,133,253,129,57,243,242,195,150,212,103,60,163,59,220,156,149,108,14,178,245,236,59,188,194,41,139,148,2,125,27,252,174,134,93,12,229,221,211,42,233,48,162,231,70,228,62,46,240,149].pack('C*')],

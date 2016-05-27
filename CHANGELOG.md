@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1 (2016-05-27)
+
+* Enhancements
+  * Support for `JOSE::JWK::Set` for key sets.
+
+* Fixes
+  * Many of the file writing operations for `JOSE::JWK` have been fixed.
+
 ## 1.1.0 (2016-05-10)
 
 * Enhancements

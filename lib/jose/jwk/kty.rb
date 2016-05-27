@@ -1,8 +1,6 @@
 module JOSE::JWK::KTY
 
-  extend self
-
-  def from_key(object)
+  def self.from_key(object)
     object = object.__getobj__ if object.is_a?(JOSE::JWK::PKeyProxy)
     case object
     when OpenSSL::PKey::EC
@@ -10,11 +8,11 @@ module JOSE::JWK::KTY
     when OpenSSL::PKey::RSA
       return JOSE::JWK::KTY_RSA.from_key(object)
     else
-      raise ArgumentError, "'object' is not a recognized key type"
+      raise ArgumentError, "'object' is not a recognized key type: #{object.class.name}"
     end
   end
 
-  def key_encryptor(kty, fields, key)
+  def self.key_encryptor(kty, fields, key)
     if key.is_a?(String)
       return JOSE::Map[
         'alg' => 'PBES2-HS256+A128KW',

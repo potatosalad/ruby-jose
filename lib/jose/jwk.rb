@@ -340,6 +340,8 @@ module JOSE
       end
       if key and jwe
         return JOSE::JWE.block_encrypt(key, to_binary, jwe)
+      elsif kty.nil? and keys
+        return keys.to_map(fields)
       else
         return kty.to_map(fields)
       end
@@ -370,7 +372,7 @@ module JOSE
     # @param [String] file
     # @return [Fixnum] bytes written
     def self.to_oct_file(jwk, file)
-      return from(jwk).to_file(file)
+      return from(jwk).to_oct_file(file)
     end
 
     # Calls {JOSE::JWK#to_oct JOSE::JWK#to_oct} on a {JOSE::JWK JOSE::JWK} and then writes the binary to `file`.
@@ -425,7 +427,7 @@ module JOSE
     # @param [String] file
     # @return [Fixnum] bytes written
     def self.to_openssh_key_file(jwk, file)
-      return from(jwk).to_file(file)
+      return from(jwk).to_openssh_key_file(file)
     end
 
     # Calls {JOSE::JWK#to_openssh_key JOSE::JWK#to_openssh_key} on a {JOSE::JWK JOSE::JWK} and then writes the binary to `file`.
@@ -464,7 +466,7 @@ module JOSE
     # @param [String] password
     # @return [Fixnum] bytes written
     def self.to_pem_file(jwk, file, password = nil)
-      return from(jwk).to_file(file, password)
+      return from(jwk).to_pem_file(file, password)
     end
 
     # Calls {JOSE::JWK#to_pem JOSE::JWK#to_pem} on a {JOSE::JWK JOSE::JWK} and then writes the binary to `file`.
