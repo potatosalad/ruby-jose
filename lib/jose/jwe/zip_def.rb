@@ -18,11 +18,19 @@ class JOSE::JWE::ZIP_DEF
   # JOSE::JWE::ZIP callbacks
 
   def compress(plain_text)
-    return Zlib.deflate(plain_text)
+    zstream = Zlib::Deflate.new(nil, -Zlib::MAX_WBITS)
+    buf = zstream.deflate(plain_text, Zlib::FINISH)
+    zstream.finish
+    zstream.close
+    return buf
   end
 
   def uncompress(cipher_text)
-    return Zlib.inflate(cipher_text)
+    zstream = Zlib::Inflate.new(-Zlib::MAX_WBITS)
+    buf = zstream.inflate(cipher_text)
+    zstream.finish
+    zstream.close
+    return buf
   end
 
 end
