@@ -1,4 +1,4 @@
-class JOSE::JWE::ZIP_DEF
+class JOSE::JWE::ZIP_DEF < Struct.new(nil)
 
   # JOSE::JWE callbacks
 

@@ -388,4 +388,51 @@ class JOSETest < Minitest::Test
       assert_equal roundtrip, term
     }
   end
+
+  def test_rfc7520_5_9
+    figures = {
+      72  => [89,111,117,32,99,97,110,32,116,114,117,115,116,32,117,115,32,116,111,32,115,116,105,99,107,32,119,105,116,104,32,121,111,117,32,116,104,114,111,117,103,104,32,116,104,105,99,107,32,97,110,100,32,116,104,105,110,226,128,147,116,111,32,116,104,101,32,98,105,116,116,101,114,32,101,110,100,46,32,65,110,100,32,121,111,117,32,99,97,110,32,116,114,117,115,116,32,117,115,32,116,111,32,107,101,101,112,32,97,110,121,32,115,101,99,114,101,116,32,111,102,32,121,111,117,114,115,226,128,147,99,108,111,115,101,114,32,116,104,97,110,32,121,111,117,32,107,101,101,112,32,105,116,32,121,111,117,114,115,101,108,102,46,32,66,117,116,32,121,111,117,32,99,97,110,110,111,116,32,116,114,117,115,116,32,117,115,32,116,111,32,108,101,116,32,121,111,117,32,102,97,99,101,32,116,114,111,117,98,108,101,32,97,108,111,110,101,44,32,97,110,100,32,103,111,32,111,102,102,32,119,105,116,104,111,117,116,32,97,32,119,111,114,100,46,32,87,101,32,97,114,101,32,121,111,117,114,32,102,114,105,101,110,100,115,44,32,70,114,111,100,111,46].pack('C*'),
+      151 => '{"kty":"oct","kid":"81b20965-8332-43d9-a468-82160ad91ac8","use":"enc","alg":"A128KW","k":"GZy6sIZ6wl9NJOKB-jnmVQ"}',
+      162 => 'bY_BDcIwDEVX-QNU3QEOrIA4pqlDokYxchxVvbEDGzIJbioOSJwc-f___HPjBu8KVFpVtAplVE1-wZo0YjNZo3C7R5v72pV5f5X382VWjYQpqZKAyjziZOr2B7kQPSy6oZIXUnDYbVKN4jNXi2u0yB7t1qSHTjmMODf9QgvrDzfTIQXnyQRuUya4zIWG3vTOdir0v7BRHFYWq3k1k1A_gSDJqtcBF-GZxw8',
+      163 => 'hC-MpLZSuwWv8sexS6ydfw',
+      164 => 'p9pUq6XHY0jfEZIl',
+      165 => '5vUT2WOtQxKWcekM_IzVQwkGgzlFDwPi',
+      166 => '{"alg":"A128KW","kid":"81b20965-8332-43d9-a468-82160ad91ac8","enc":"A128GCM","zip":"DEF"}',
+      167 => 'eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC04MjE2MGFkOTFhYzgiLCJlbmMiOiJBMTI4R0NNIiwiemlwIjoiREVGIn0',
+      168 => 'HbDtOsdai1oYziSx25KEeTxmwnh8L8jKMFNc1k3zmMI6VB8hry57tDZ61jXyezSPt0fdLVfe6Jf5y5-JaCap_JQBcb5opbmT60uWGml8blyiMQmOn9J--XhhlYg0m-BHaqfDO5iTOWxPxFMUedx7WCy8mxgDHj0aBMG6152PsM-w5E_o2B3jDbrYBKhpYA7qi3AyijnCJ7BP9rr3U8kxExCpG3mK420TjOw',
+      169 => 'VILuUwuIxaLVmh5X-T7kmA',
+      170 => 'eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC04MjE2MGFkOTFhYzgiLCJlbmMiOiJBMTI4R0NNIiwiemlwIjoiREVGIn0.5vUT2WOtQxKWcekM_IzVQwkGgzlFDwPi.p9pUq6XHY0jfEZIl.HbDtOsdai1oYziSx25KEeTxmwnh8L8jKMFNc1k3zmMI6VB8hry57tDZ61jXyezSPt0fdLVfe6Jf5y5-JaCap_JQBcb5opbmT60uWGml8blyiMQmOn9J--XhhlYg0m-BHaqfDO5iTOWxPxFMUedx7WCy8mxgDHj0aBMG6152PsM-w5E_o2B3jDbrYBKhpYA7qi3AyijnCJ7BP9rr3U8kxExCpG3mK420TjOw.VILuUwuIxaLVmh5X-T7kmA',
+      172 => '{"protected":"eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC04MjE2MGFkOTFhYzgiLCJlbmMiOiJBMTI4R0NNIiwiemlwIjoiREVGIn0","encrypted_key":"5vUT2WOtQxKWcekM_IzVQwkGgzlFDwPi","iv":"p9pUq6XHY0jfEZIl","ciphertext":"HbDtOsdai1oYziSx25KEeTxmwnh8L8jKMFNc1k3zmMI6VB8hry57tDZ61jXyezSPt0fdLVfe6Jf5y5-JaCap_JQBcb5opbmT60uWGml8blyiMQmOn9J--XhhlYg0m-BHaqfDO5iTOWxPxFMUedx7WCy8mxgDHj0aBMG6152PsM-w5E_o2B3jDbrYBKhpYA7qi3AyijnCJ7BP9rr3U8kxExCpG3mK420TjOw","tag":"VILuUwuIxaLVmh5X-T7kmA"}'
+    }
+    # 5.9.1
+    v_5_9_1_plain_text = figures[72]
+    v_5_9_1_jwk = JOSE::JWK.from_binary(figures[151])
+    # 5.9.2
+    v_5_9_2_compressed_plain_text = figures[162]
+    assert_equal v_5_9_1_plain_text, JOSE::JWE::ZIP_DEF.new.uncompress(JOSE.urlsafe_decode64(v_5_9_2_compressed_plain_text))
+    assert_equal v_5_9_2_compressed_plain_text, JOSE.urlsafe_encode64(JOSE::JWE::ZIP_DEF.new.compress(v_5_9_1_plain_text))
+    v_5_9_2_cek = figures[163]
+    v_5_9_2_iv = figures[164]
+    # 5.9.3
+    v_5_9_3_encrypted_key = figures[165]
+    assert_equal v_5_9_3_encrypted_key, JOSE.urlsafe_encode64(JOSE::JWE::ALG_AES_KW.new(128).key_encrypt(v_5_9_1_jwk, nil, JOSE.urlsafe_decode64(v_5_9_2_cek)).first)
+    assert_equal v_5_9_2_cek, JOSE.urlsafe_encode64(JOSE::JWE::ALG_AES_KW.new(128).key_decrypt(v_5_9_1_jwk, nil, JOSE.urlsafe_decode64(v_5_9_3_encrypted_key)))
+    # 5.9.4
+    v_5_9_4_jwe = JOSE::JWE.from_binary(figures[166])
+    v_5_9_4_jwe_protected = figures[167]
+    v_5_9_4_cipher_text = figures[168]
+    v_5_9_4_cipher_tag = figures[169]
+    v_5_9_5_jwe_compact = figures[170]
+    v_5_9_5_jwe_map = JOSE.decode(figures[172])
+    plain_text, jwe = JOSE::JWE.block_decrypt(v_5_9_1_jwk, v_5_9_5_jwe_compact)
+    assert_equal v_5_9_1_plain_text, plain_text
+    assert_equal v_5_9_4_jwe, jwe
+    plain_text, jwe = JOSE::JWE.block_decrypt(v_5_9_1_jwk, v_5_9_5_jwe_map)
+    assert_equal v_5_9_1_plain_text, plain_text
+    assert_equal v_5_9_4_jwe, jwe
+    # Roundtrip test
+    cipher_text = JOSE::JWE.block_encrypt(v_5_9_1_jwk, v_5_9_1_plain_text, v_5_9_4_jwe, JOSE.urlsafe_decode64(v_5_9_2_cek), JOSE.urlsafe_decode64(v_5_9_2_iv)).compact
+    plain_text, _ = JOSE::JWE.block_decrypt(v_5_9_1_jwk, cipher_text)
+    assert_equal v_5_9_1_plain_text, plain_text
+  end
 end
