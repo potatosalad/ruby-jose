@@ -68,6 +68,7 @@ class JOSE::JWATest < Minitest::Test
             'Ed25519ph',
             'Ed448',
             'Ed448ph',
+            'EdDSA',
             'ES256',
             'ES384',
             'ES512',

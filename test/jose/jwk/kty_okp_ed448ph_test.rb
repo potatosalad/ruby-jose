@@ -55,7 +55,7 @@ class JOSE::JWK::KTY_OKP_Ed448phTest < Minitest::Test
 
   def test_signer
     plain_jwk = JOSE::JWK.from(SECRET_JWK_JSON)
-    assert_equal JOSE::Map['alg' => 'Ed448ph'], JOSE::JWK.signer(plain_jwk)
+    assert_equal JOSE::Map['alg' => 'EdDSA'], JOSE::JWK.signer(plain_jwk)
     extra_jwk = plain_jwk.merge({'alg' => 'Ed448ph', 'use' => 'sig'})
     assert_equal JOSE::Map['alg' => 'Ed448ph'], JOSE::JWK.signer(extra_jwk)
     public_jwk = JOSE::JWK.from(PUBLIC_JWK_JSON)
@@ -64,7 +64,7 @@ class JOSE::JWK::KTY_OKP_Ed448phTest < Minitest::Test
 
   def test_verifier
     plain_jwk = JOSE::JWK.from(SECRET_JWK_JSON)
-    assert_equal ['Ed448ph'], JOSE::JWK.verifier(plain_jwk)
+    assert_equal ['Ed448ph', 'EdDSA'], JOSE::JWK.verifier(plain_jwk)
     extra_jwk = plain_jwk.merge({'alg' => 'Ed448ph', 'use' => 'sig'})
     assert_equal ['Ed448ph'], JOSE::JWK.verifier(extra_jwk)
   end

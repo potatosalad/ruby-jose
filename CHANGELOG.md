@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.2 (2016-07-07)
+
+* Enhancements
+  * Improved handling of RSA private keys in SMF (Straightforward Method) form to CRT (Chinese Remainder Theorem) form, see [potatosalad/erlang-jose#19](https://github.com/potatosalad/erlang-jose/issues/19)  This is especially useful for keys produced by Java programs using the `RSAPrivateKeySpec` API as mentioned in [Section 9.3 of RFC 7517](https://tools.ietf.org/html/rfc7517#section-9.3).
+  * Updated EdDSA operations to comply with draft 04 of [draft-ietf-jose-cfrg-curves-04](https://tools.ietf.org/html/draft-ietf-jose-cfrg-curves-04).
+
+* Fixes
+  * Fixed compression encoding bug for `{"zip":"DEF"}` operations (thanks to [@amadden734](https://github.com/amadden734) see [#3](https://github.com/potatosalad/ruby-jose/pull/3))
+
 ## 1.1.1 (2016-05-27)
 
 * Enhancements

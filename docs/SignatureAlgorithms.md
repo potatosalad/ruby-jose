@@ -21,6 +21,7 @@ Here are the supported options for the `alg` parameter, grouped by similar funci
   - [`Ed25519ph`](http://www.rubydoc.info/gems/jose/JOSE/JWS#EdDSA-25519-group)
   - [`Ed448`](http://www.rubydoc.info/gems/jose/JOSE/JWS#EdDSA-448-group)
   - [`Ed448ph`](http://www.rubydoc.info/gems/jose/JOSE/JWS#EdDSA-448-group)
+  - [`EdDSA`](http://www.rubydoc.info/gems/jose/JOSE/JWS#EdDSA-group)
 - HMAC using SHA-2
   - [`HS256`](http://www.rubydoc.info/gems/jose/JOSE/JWS#HMACSHA2-group)
   - [`HS384`](http://www.rubydoc.info/gems/jose/JOSE/JWS#HMACSHA2-group)

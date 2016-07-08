@@ -19,7 +19,11 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
           rsa.iqmp = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['qi']), 2)
           return JOSE::JWK::KTY_RSA.new(JOSE::JWK::PKeyProxy.new(rsa)), fields.except('kty', 'd', 'dp', 'dq', 'e', 'n', 'p', 'q', 'qi')
         else
-          raise ArgumentError, "invalid 'RSA' JWK"
+          d   = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2)
+          e   = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['e']), 2)
+          n   = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['n']), 2)
+          rsa = convert_sfm_to_crt(d, e, n)
+          return JOSE::JWK::KTY_RSA.new(JOSE::JWK::PKeyProxy.new(rsa)), fields.except('kty', 'd', 'dp', 'dq', 'e', 'n', 'p', 'q', 'qi')
         end
       else
         rsa   = OpenSSL::PKey::RSA.new
@@ -200,4 +204,64 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
     return JOSE::JWK::PEM.to_binary(key, password)
   end
 
+  # Internal functions
+
+private
+  def self.convert_sfm_to_crt(d, e, n)
+    ktot = d * e - 1
+    t = convert_sfm_to_crt_find_t(ktot)
+    a = 2.to_bn
+    k = t
+    p = convert_sfm_to_crt_find_p(ktot, t, k, a, n, d)
+    q, = n / p
+    if q > p
+      p, q = q, p
+    end
+    dp = d % (p - 1)
+    dq = d % (q - 1)
+    qi = q.mod_inverse(p)
+    rsa      = OpenSSL::PKey::RSA.new
+    rsa.d    = d
+    rsa.dmp1 = dp
+    rsa.dmq1 = dq
+    rsa.e    = e
+    rsa.n    = n
+    rsa.p    = p
+    rsa.q    = q
+    rsa.iqmp = qi
+    return rsa
+  end
+
+  def self.convert_sfm_to_crt_find_t(ktot)
+    t = ktot
+    loop do
+      if t > 0 and (t % 2) == 0
+        t, = t / 2
+      else
+        break
+      end
+    end
+    return t
+  end
+
+  def self.convert_sfm_to_crt_find_p(ktot, t, k, a, n, d)
+    p = nil
+    loop do
+      break if not p.nil?
+      loop do
+        break if not p.nil?
+        break if k >= ktot
+        c = a.mod_exp(k, n)
+        if c != 1 and c != (n - 1) and c.mod_exp(2, n) == 1
+          p = (c + 1).gcd(n)
+        else
+          k = k * 2
+        end
+      end
+      break if not p.nil?
+      k = t
+      a = a + 2
+    end
+    return p
+  end
 end

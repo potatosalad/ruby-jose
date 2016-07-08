@@ -68,4 +68,12 @@ class JOSE::JWK::KTY_RSATest < Minitest::Test
     end
   end
 
+  def test_sfm_and_crt
+    RSAGenerator.cache do
+      jwk_crt = JOSE::JWK.from_binary(SECRET_JWK_JSON)
+      jwk_sfm = jwk_crt.to_map.except('dp', 'dq', 'p', 'q', 'qi')
+      assert_equal jwk_crt, JOSE::JWK.from(jwk_sfm)
+    end
+  end
+
 end

@@ -12,6 +12,8 @@ class JOSE::JWS::ALG_EDDSA < Struct.new(:sign_type)
       return new(:Ed448), fields.delete('alg')
     when 'Ed448ph'
       return new(:Ed448ph), fields.delete('alg')
+    when 'EdDSA'
+      return new(:EdDSA), fields.delete('alg')
     else
       raise ArgumentError, "invalid 'alg' for JWS: #{fields['alg'].inspect}"
     end
@@ -25,7 +27,8 @@ class JOSE::JWS::ALG_EDDSA < Struct.new(:sign_type)
   # JOSE::JWS::ALG callbacks
 
   def generate_key(fields)
-    return JOSE::JWS::ALG.generate_key([:okp, sign_type], sign_type.to_s)
+    okp_type = sign_type == :EdDSA ? :Ed25519 : sign_type
+    return JOSE::JWS::ALG.generate_key([:okp, okp_type], sign_type.to_s)
   end
 
   def sign(jwk, message)

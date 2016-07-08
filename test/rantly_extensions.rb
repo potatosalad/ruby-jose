@@ -83,7 +83,8 @@ class Rantly
       'Ed25519',
       'Ed25519ph',
       'Ed448',
-      'Ed448ph'
+      'Ed448ph',
+      'EdDSA'
     ],
     :hmacsha2 => [
       'HS256',
@@ -110,7 +111,7 @@ class Rantly
     end
     raise ArgumentError, "'groups' may be of #{JWS_ALG_GROUPS.keys.map(&:inspect).join(', ')}" if options.empty?
     # Ed448, Ed448ph, RSA PKCS#1.5, and PSS operations are slower, so let's restrict the probability they get chosen.
-    options_faster = options.clone.delete_if { |option| option.start_with?('Ed448') or option.start_with?('PS') or option.start_with?('RS') }
+    options_faster = options.clone.delete_if { |option| option.start_with?('Ed448') or option.start_with?('EdDSA') or option.start_with?('PS') or option.start_with?('RS') }
     return freq(
       [10, :choose, *options_faster],
       [ 1, :choose, *options]

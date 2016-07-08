@@ -78,8 +78,8 @@ class JOSE::JWK::KTY_OKP_Ed448ph < Struct.new(:okp)
     return JOSE::JWK::KTY.key_encryptor(self, fields, key)
   end
 
-  def sign(message, digest_type)
-    raise ArgumentError, "'digest_type' must be :Ed448ph" if digest_type != :Ed448ph
+  def sign(message, sign_type)
+    raise ArgumentError, "'sign_type' must be :Ed448ph or :EdDSA" if sign_type != :Ed448ph and sign_type != :EdDSA
     raise NotImplementedError, "Ed448ph public key cannot be used for signing" if okp.bytesize != SK_BYTES
     return JOSE::JWA::Curve448.ed448ph_sign(message, okp)
   end
@@ -88,7 +88,7 @@ class JOSE::JWK::KTY_OKP_Ed448ph < Struct.new(:okp)
     if okp.bytesize == SK_BYTES and fields and fields['use'] == 'sig' and not fields['alg'].nil?
       return JOSE::Map['alg' => fields['alg']]
     elsif okp.bytesize == SK_BYTES
-      return JOSE::Map['alg' => 'Ed448ph']
+      return JOSE::Map['alg' => 'EdDSA']
     else
       raise ArgumentError, "signing not supported for public keys"
     end
@@ -98,12 +98,12 @@ class JOSE::JWK::KTY_OKP_Ed448ph < Struct.new(:okp)
     if fields and fields['use'] == 'sig' and not fields['alg'].nil?
       return [fields['alg']]
     else
-      return ['Ed448ph']
+      return ['Ed448ph', 'EdDSA']
     end
   end
 
-  def verify(message, digest_type, signature)
-    raise ArgumentError, "'digest_type' must be :Ed448ph" if digest_type != :Ed448ph
+  def verify(message, sign_type, signature)
+    raise ArgumentError, "'sign_type' must be :Ed448ph or :EdDSA" if sign_type != :Ed448ph and sign_type != :EdDSA
     pk = okp
     pk = JOSE::JWA::Curve448.ed448ph_secret_to_public(okp) if okp.bytesize == SK_BYTES
     return JOSE::JWA::Curve448.ed448ph_verify(signature, message, pk)
