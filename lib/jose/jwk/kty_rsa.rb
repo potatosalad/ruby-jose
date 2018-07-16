@@ -9,14 +9,20 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
       elsif fields['d'].is_a?(String)
         if fields['dp'].is_a?(String) and fields['dq'].is_a?(String) and fields['p'].is_a?(String) and fields['q'].is_a?(String) and fields['qi'].is_a?(String)
           rsa      = OpenSSL::PKey::RSA.new
-          rsa.d    = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2)
-          rsa.dmp1 = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['dp']), 2)
-          rsa.dmq1 = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['dq']), 2)
-          rsa.e    = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['e']), 2)
-          rsa.n    = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['n']), 2)
-          rsa.p    = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['p']), 2)
-          rsa.q    = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['q']), 2)
-          rsa.iqmp = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['qi']), 2)
+          rsa.set_key(
+            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['n']), 2),
+            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['e']), 2),
+            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2)
+          )
+          rsa.set_factors(
+            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['p']), 2),
+            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['q']), 2)
+          )
+          rsa.set_crt_params(
+            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['dp']), 2),
+            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['dq']), 2),
+            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['qi']), 2)
+          )
           return JOSE::JWK::KTY_RSA.new(JOSE::JWK::PKeyProxy.new(rsa)), fields.except('kty', 'd', 'dp', 'dq', 'e', 'n', 'p', 'q', 'qi')
         else
           d   = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2)
@@ -27,8 +33,11 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
         end
       else
         rsa   = OpenSSL::PKey::RSA.new
-        rsa.e = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['e']), 2)
-        rsa.n = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['n']), 2)
+        rsa.set_key(
+          OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['n']), 2),
+          OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['e']), 2),
+          nil
+        )
         return JOSE::JWK::KTY_RSA.new(JOSE::JWK::PKeyProxy.new(rsa)), fields.except('kty', 'e', 'n')
       end
     else
@@ -220,15 +229,11 @@ private
     dp = d % (p - 1)
     dq = d % (q - 1)
     qi = q.mod_inverse(p)
-    rsa      = OpenSSL::PKey::RSA.new
-    rsa.d    = d
-    rsa.dmp1 = dp
-    rsa.dmq1 = dq
-    rsa.e    = e
-    rsa.n    = n
-    rsa.p    = p
-    rsa.q    = q
-    rsa.iqmp = qi
+    
+    rsa = OpenSSL::PKey::RSA.new
+    rsa.set_key(n, e, d)
+    rsa.set_factors(p, q)
+    rsa.set_crt_params(dp, dq, qi)
     return rsa
   end
 
