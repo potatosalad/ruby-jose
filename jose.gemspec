@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "jose"
   spec.version       = JOSE::VERSION
   spec.authors       = ["Andrew Bennett"]
-  spec.email         = ["andrew@pixid.com"]
+  spec.email         = ["potatosaladx@gmail.com"]
 
   spec.summary       = %q{JSON Object Signing and Encryption}
   spec.description   = %q{JSON Object Signing and Encryption}
@@ -29,9 +29,11 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "hamster"
 
-  spec.add_development_dependency "bundler", "~> 1.12"
-  spec.add_development_dependency "rake", "~> 11.1"
+  spec.add_development_dependency "bundler", "~> 1.16"
+  spec.add_development_dependency "rake", "~> 12.3"
   spec.add_development_dependency "minitest"
   spec.add_development_dependency "json"
   spec.add_development_dependency "rbnacl-libsodium"
+  spec.add_development_dependency "ed25519"
+  spec.add_development_dependency "x25519"
 end

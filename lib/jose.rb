@@ -6,6 +6,7 @@ require 'json'
 require 'openssl'
 require 'securerandom'
 require 'thread'
+require 'zlib'
 
 # JOSE stands for JSON Object Signing and Encryption which is a is a set of
 # standards established by the [JOSE Working Group](https://datatracker.ietf.org/wg/jose).

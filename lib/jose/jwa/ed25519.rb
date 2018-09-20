@@ -114,4 +114,79 @@ module JOSE::JWA::Ed25519
     return verify(sig, Digest::SHA512.digest(m), pk)
   end
 
+  def coerce_publickey_bytes!(publickey)
+    raise ArgumentError, "publickey size must be #{C_publickeybytes} bytes" if not valid_publickey?(publickey)
+    publickey = publickey.to_bytes(C_bits) if publickey.is_a?(JOSE::JWA::FieldElement)
+    publickey = publickey.to_bn if not publickey.is_a?(OpenSSL::BN) and publickey.respond_to?(:to_bn)
+    publickey = publickey.to_s(2).rjust(C_bytes, JOSE::JWA::ZERO_PAD).reverse if publickey.is_a?(OpenSSL::BN)
+    return publickey
+  end
+
+  def coerce_secret_bytes!(secret)
+    raise ArgumentError, "secret size must be #{C_secretbytes} bytes" if not valid_secret?(secret)
+    secret = secret.to_bytes(C_bits) if secret.is_a?(JOSE::JWA::FieldElement)
+    secret = secret.to_bn if not secret.is_a?(OpenSSL::BN) and secret.respond_to?(:to_bn)
+    secret = secret.to_s(2).rjust(C_bytes, JOSE::JWA::ZERO_PAD).reverse if secret.is_a?(OpenSSL::BN)
+    return secret
+  end
+
+  def coerce_secretkey_bytes!(secretkey)
+    raise ArgumentError, "secretkey size must be #{C_secretkeybytes} bytes" if not valid_secretkey?(secretkey)
+    secretkey = secretkey.to_bytes(C_secretkeybytes * 8) if secretkey.is_a?(JOSE::JWA::FieldElement)
+    secretkey = secretkey.to_bn if not secretkey.is_a?(OpenSSL::BN) and secretkey.respond_to?(:to_bn)
+    secretkey = secretkey.to_s(2).rjust(C_secretkeybytes, JOSE::JWA::ZERO_PAD).reverse if secretkey.is_a?(OpenSSL::BN)
+    return secretkey
+  end
+
+  def valid_publickey?(publickey)
+    return true if publickey.is_a?(JOSE::JWA::FieldElement) and publickey.p == C_p
+    if not publickey.is_a?(OpenSSL::BN) and publickey.respond_to?(:to_bn)
+      publickey = publickey.to_bn
+    end
+    pkbytes = 0
+    if publickey.is_a?(OpenSSL::BN)
+      if publickey.num_bytes > C_publickeybytes
+        pkbytes = publickey.num_bytes
+      else
+        pkbytes = C_publickeybytes
+      end
+    end
+    pkbytes = publickey.bytesize if publickey.respond_to?(:bytesize)
+    return !!(pkbytes == C_publickeybytes)
+  end
+
+  def valid_secret?(secret)
+    return true if secret.is_a?(JOSE::JWA::FieldElement) and secret.p == C_p
+    if not secret.is_a?(OpenSSL::BN) and secret.respond_to?(:to_bn)
+      secret = secret.to_bn
+    end
+    seedbytes = 0
+    if secret.is_a?(OpenSSL::BN)
+      if secret.num_bytes > C_secretbytes
+        seedbytes = secret.num_bytes
+      else
+        seedbytes = C_secretbytes
+      end
+    end
+    seedbytes = secret.bytesize if secret.respond_to?(:bytesize)
+    return !!(seedbytes == C_secretbytes)
+  end
+
+  def valid_secretkey?(secretkey)
+    return true if secretkey.is_a?(JOSE::JWA::FieldElement) and secretkey.p == C_p
+    if not secretkey.is_a?(OpenSSL::BN) and secretkey.respond_to?(:to_bn)
+      secretkey = secretkey.to_bn
+    end
+    skbytes = 0
+    if secretkey.is_a?(OpenSSL::BN)
+      if secretkey.num_bytes > C_secretkeybytes
+        skbytes = secretkey.num_bytes
+      else
+        skbytes = C_secretkeybytes
+      end
+    end
+    skbytes = secretkey.bytesize if secretkey.respond_to?(:bytesize)
+    return !!(skbytes == C_secretkeybytes)
+  end
+
 end

@@ -12,7 +12,7 @@ end
 group :test do
   gem 'minitest-focus', require: false
   gem 'minitest-perf', require: false
-  gem 'rantly', github: 'abargnesi/rantly', ref: '4d219ea3eb340a5153a43d051b2e22ccb2bce274', require: false
+  gem 'rantly', github: 'abargnesi/rantly', ref: '2875f63bfc695d270ecb574c56d1a7d8f6af0153', require: false
   gem 'simplecov', require: false
   if ENV['CI']
     gem 'coveralls', require: false

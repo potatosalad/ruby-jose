@@ -94,10 +94,13 @@ private
 end
 
 require 'jose/jwa/ed25519'
+require 'jose/jwa/ed25519_cryptorb'
 require 'jose/jwa/ed25519_rbnacl'
 require 'jose/jwa/x25519'
+require 'jose/jwa/x25519_cryptorb'
 require 'jose/jwa/x25519_rbnacl'
 
 require 'jose/jwa/curve25519_unsupported'
 require 'jose/jwa/curve25519_ruby'
+require 'jose/jwa/curve25519_cryptorb'
 require 'jose/jwa/curve25519_rbnacl'
