@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.3 (2018-09-20)
+
+* Enhancements
+  * Add support for [crypto-rb/ed25519](https://github.com/crypto-rb/ed25519) and [crypto-rb/x25519](https://github.com/crypto-rb/x25519) for curve25519 operations.
+
+* Fixes
+  * Support for Ruby 2.5.x RSA keys (thanks to [@waynerobinson](https://github.com/waynerobinson) see [#7](https://github.com/potatosalad/ruby-jose/pull/7))
+
 ## 1.1.2 (2016-07-07)
 
 * Enhancements
