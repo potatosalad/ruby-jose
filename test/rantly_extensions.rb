@@ -14,6 +14,9 @@ class Rantly
       'A192KW',
       'A256KW'
     ],
+    :c20pkw => [
+      'C20PKW'
+    ],
     :direct => [
       'dir'
     ],
@@ -61,7 +64,7 @@ class Rantly
       'A192GCM',
       'A256GCM'
     ],
-    :chacha20_poly1305 => [
+    :c20p => [
       'C20P'
     ]
   }.freeze

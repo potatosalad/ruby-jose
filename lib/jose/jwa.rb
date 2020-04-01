@@ -127,7 +127,8 @@ module JOSE
         'A256GCM',
         'A128CBC-HS256',
         'A192CBC-HS384',
-        'A256CBC-HS512'
+        'A256CBC-HS512',
+        'C20P'
       ])
       jwe_alg = __jwe_alg_support_check__([
         ['A128GCMKW', :block],
@@ -136,6 +137,7 @@ module JOSE
         ['A128KW', :block],
         ['A192KW', :block],
         ['A256KW', :block],
+        ['C20PKW', :block],
         ['ECDH-ES', :box],
         ['ECDH-ES+A128KW', :box],
         ['ECDH-ES+A192KW', :box],

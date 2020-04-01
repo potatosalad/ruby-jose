@@ -1076,6 +1076,8 @@ module JOSE
           JOSE::JWE::ALG_AES_KW
         when 'A128GCMKW', 'A192GCMKW', 'A256GCMKW'
           JOSE::JWE::ALG_AES_GCM_KW
+        when 'C20PKW'
+          JOSE::JWE::ALG_C20P_KW
         when 'dir'
           JOSE::JWE::ALG_dir
         when 'ECDH-ES', 'ECDH-ES+A128KW', 'ECDH-ES+A192KW', 'ECDH-ES+A256KW'
