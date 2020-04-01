@@ -5,6 +5,7 @@ dist: xenial
 
 env:
   global:
+    - COVERAGE=true
     - JOSE_CRYPTO_FALLBACK=true
     - RUBYOPT="-W0"
 
