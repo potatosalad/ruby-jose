@@ -231,7 +231,7 @@ module JOSE
             cipher_text = recv_jwk.box_encrypt(plain_text, send_jwk).compact
             next recv_jwk.box_decrypt(cipher_text).first == plain_text
           elsif strategy == :rsa
-            rsa ||= JOSE::JWK.generate_key([:rsa, 1024])
+            rsa ||= JOSE::JWK.generate_key([:rsa, 2048])
             cipher_text = rsa.block_encrypt(plain_text, { 'alg' => alg, 'enc' => enc }).compact
             next rsa.block_decrypt(cipher_text).first == plain_text
           elsif strategy == :direct
@@ -290,7 +290,7 @@ module JOSE
           kty.push(key_type) if not kty_OKP_crv.empty?
         when 'RSA'
           begin
-            JOSE::JWK.generate_key([:rsa, 256])
+            JOSE::JWK.generate_key([:rsa, 1024])
             kty.push(key_type)
           rescue StandardError, NotImplementedError
             # do nothing
@@ -314,7 +314,7 @@ module JOSE
         begin
           jwk = nil
           jwk ||= JOSE::JWK.generate_key([:oct, 0]).merge({ 'alg' => alg, 'use' => 'sig' }) if alg == 'none'
-          jwk ||= (rsa ||= JOSE::JWK.generate_key([:rsa, 1024])).merge({ 'alg' => alg, 'use' => 'sig' }) if alg.start_with?('RS') or alg.start_with?('PS')
+          jwk ||= (rsa ||= JOSE::JWK.generate_key([:rsa, 2048])).merge({ 'alg' => alg, 'use' => 'sig' }) if alg.start_with?('RS') or alg.start_with?('PS')
           jwk ||= JOSE::JWS.generate_key({ 'alg' => alg })
           signed_text = jwk.sign(plain_text).compact
           next jwk.verify_strict(signed_text, [alg]).first
