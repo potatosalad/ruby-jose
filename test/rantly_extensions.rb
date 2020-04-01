@@ -60,6 +60,9 @@ class Rantly
       'A128GCM',
       'A192GCM',
       'A256GCM'
+    ],
+    :chacha20_poly1305 => [
+      'C20P'
     ]
   }.freeze
 

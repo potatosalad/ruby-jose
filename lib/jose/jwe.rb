@@ -1095,6 +1095,8 @@ module JOSE
           JOSE::JWE::ENC_AES_CBC_HMAC
         when 'A128GCM', 'A192GCM', 'A256GCM'
           JOSE::JWE::ENC_AES_GCM
+        when 'C20P'
+          JOSE::JWE::ENC_C20P
         else
           raise ArgumentError, "unknown 'enc': #{jwe.fields['enc'].inspect}"
         end
