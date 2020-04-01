@@ -1,6 +1,6 @@
 # JOSE
 
-[![Travis](https://img.shields.io/travis/potatosalad/ruby-jose.svg?maxAge=86400)](https://travis-ci.org/potatosalad/ruby-jose) [![Coverage Status](https://coveralls.io/repos/github/potatosalad/ruby-jose/badge.svg?branch=master)](https://coveralls.io/github/potatosalad/ruby-jose?branch=master) [![Gem](https://img.shields.io/gem/v/jose.svg?maxAge=86400)](https://rubygems.org/gems/jose) [![Docs](https://img.shields.io/badge/yard-docs-blue.svg?maxAge=86400)](http://www.rubydoc.info/gems/jose) [![Inline docs](http://inch-ci.org/github/potatosalad/ruby-jose.svg?branch=master&style=shields)](http://inch-ci.org/github/potatosalad/ruby-jose)
+[![Travis](https://img.shields.io/travis/potatosalad/ruby-jose.svg?maxAge=86400)](https://travis-ci.org/potatosalad/ruby-jose) [![Coverage Status](https://codecov.io/gh/potatosalad/ruby-jose/branch/master/graph/badge.svg)](https://codecov.io/gh/potatosalad/ruby-jose) [![Gem](https://img.shields.io/gem/v/jose.svg?maxAge=86400)](https://rubygems.org/gems/jose) [![Docs](https://img.shields.io/badge/yard-docs-blue.svg?maxAge=86400)](http://www.rubydoc.info/gems/jose) [![Inline docs](http://inch-ci.org/github/potatosalad/ruby-jose.svg?branch=master&style=shields)](http://inch-ci.org/github/potatosalad/ruby-jose)
 
 JSON Object Signing and Encryption (JOSE) for Ruby.
 

@@ -15,7 +15,7 @@ group :test do
   gem 'rantly', require: false
   gem 'simplecov', require: false
   if ENV['CI']
-    gem 'coveralls', require: false
+    gem 'codecov', require: false
   end
 end
 
