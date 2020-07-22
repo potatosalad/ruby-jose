@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{JSON Object Signing and Encryption}
   spec.description   = %q{JSON Object Signing and Encryption}
   spec.homepage      = "https://github.com/potatosalad/ruby-jose"
-  spec.license       = "MPL-2.0"
+  spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
   # delete this section to allow pushing this gem to any host.
