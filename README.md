@@ -65,4 +65,4 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/potato
 
 ## License
 
-The gem is available as open source under the terms of the [MPL-2.0 License](http://opensource.org/licenses/MPL-2.0).
+The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
