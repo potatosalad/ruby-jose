@@ -1086,6 +1086,8 @@ module JOSE
           JOSE::JWE::ALG_PBES2
         when 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'
           JOSE::JWE::ALG_RSA
+        when 'XC20PKW'
+          JOSE::JWE::ALG_XC20P_KW
         else
           raise ArgumentError, "unknown 'alg': #{jwe.fields['alg'].inspect}"
         end
@@ -1099,6 +1101,8 @@ module JOSE
           JOSE::JWE::ENC_AES_GCM
         when 'C20P'
           JOSE::JWE::ENC_C20P
+        when 'XC20P'
+          JOSE::JWE::ENC_XC20P
         else
           raise ArgumentError, "unknown 'enc': #{jwe.fields['enc'].inspect}"
         end

@@ -28,6 +28,7 @@ class JOSE::JWATest < Minitest::Test
             'RSA1_5',
             'RSA-OAEP',
             'RSA-OAEP-256',
+            'XC20PKW',
             'dir'
           ],
           :enc => [
@@ -37,7 +38,8 @@ class JOSE::JWATest < Minitest::Test
             'A128CBC-HS256',
             'A192CBC-HS384',
             'A256CBC-HS512',
-            'C20P'
+            'C20P',
+            'XC20P'
           ],
           :zip => [
             'DEF'

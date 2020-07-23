@@ -35,6 +35,9 @@ class Rantly
       'RSA1_5',
       'RSA-OAEP',
       'RSA-OAEP-256'
+    ],
+    :xc20pkw => [
+      'XC20PKW'
     ]
   }.freeze
 
@@ -66,6 +69,9 @@ class Rantly
     ],
     :c20p => [
       'C20P'
+    ],
+    :xc20p => [
+      'XC20P'
     ]
   }.freeze
 

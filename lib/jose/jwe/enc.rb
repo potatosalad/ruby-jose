@@ -7,3 +7,4 @@ end
 require 'jose/jwe/enc_aes_cbc_hmac'
 require 'jose/jwe/enc_aes_gcm'
 require 'jose/jwe/enc_c20p'
+require 'jose/jwe/enc_xc20p'

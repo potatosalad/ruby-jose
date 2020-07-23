@@ -148,11 +148,31 @@ module JOSE
     return Base64.strict_encode64(binary).tr('+/', '-_').delete('=')
   end
 
+  # Gets the current XChaCha20-Poly1305 module used by {JOSE::JWA::XChaCha20Poly1305 JOSE::JWA::XChaCha20Poly1305}, see {.xchacha20poly1305_module=} for default.
+  # @return [Module]
+  def self.xchacha20poly1305_module
+    return JOSE::JWA::XChaCha20Poly1305.__implementation__
+  end
+
+  # Sets the current XChaCha20Poly1305 module used by {JOSE::JWA::XChaCha20Poly1305 JOSE::JWA::XChaCha20Poly1305}.
+  #
+  # Currently supported XChaCha20Poly1305 modules (first found is used as default):
+  #
+  #   * {https://github.com/cryptosphere/rbnacl `RbNaCl`}
+  #
+  # Additional modules that implement the functions specified in {JOSE::JWA::XChaCha20Poly1305 JOSE::JWA::XChaCha20Poly1305} may also be used.
+  # @param [Module] mod
+  # @return [Module]
+  def self.xchacha20poly1305_module=(mod)
+    JOSE::JWA::XChaCha20Poly1305.__implementation__ = mod
+  end
+
 private
 
   def self.__config_change__
     JOSE::JWA::Curve25519.__config_change__
     JOSE::JWA::Curve448.__config_change__
+    JOSE::JWA::XChaCha20Poly1305.__config_change__
   end
 
   def self.sort_maps(term)

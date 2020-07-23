@@ -128,7 +128,8 @@ module JOSE
         'A128CBC-HS256',
         'A192CBC-HS384',
         'A256CBC-HS512',
-        'C20P'
+        'C20P',
+        'XC20P'
       ])
       jwe_alg = __jwe_alg_support_check__([
         ['A128GCMKW', :block],
@@ -148,6 +149,7 @@ module JOSE
         ['RSA1_5', :rsa],
         ['RSA-OAEP', :rsa],
         ['RSA-OAEP-256', :rsa],
+        ['XC20PKW', :block],
         ['dir', :direct]
       ], jwe_enc)
       jwe_zip = __jwe_zip_support_check__([
@@ -339,3 +341,4 @@ require 'jose/jwa/curve25519'
 require 'jose/jwa/curve448'
 require 'jose/jwa/pkcs1'
 require 'jose/jwa/pkcs7'
+require 'jose/jwa/xchacha20poly1305'
