@@ -14,13 +14,24 @@ class JOSE::JWK::KTY_EC < Struct.new(:key)
       else
         raise ArgumentError, "invalid 'EC' JWK"
       end
-      ec = OpenSSL::PKey::EC.new(crv)
       x = JOSE.urlsafe_decode64(fields['x'])
       y = JOSE.urlsafe_decode64(fields['y'])
-      ec.public_key = OpenSSL::PKey::EC::Point.new(
-        OpenSSL::PKey::EC::Group.new(crv),
-        OpenSSL::BN.new([0x04, x, y].pack('Ca*a*'), 2)
+
+      group    = OpenSSL::PKey::EC::Group.new(crv)
+      bn       = OpenSSL::BN.new([0x04, x, y].pack('Ca*a*'), 2)
+      point    = OpenSSL::PKey::EC::Point.new group, bn
+      sequence = OpenSSL::ASN1::Sequence(
+        [
+          OpenSSL::ASN1::Sequence(
+            [
+              OpenSSL::ASN1::ObjectId("id-ecPublicKey"),
+              OpenSSL::ASN1::ObjectId(crv)
+            ]
+          ),
+          OpenSSL::ASN1::BitString(point.to_octet_string(:uncompressed))
+        ]
       )
+      ec = OpenSSL::PKey::EC.new sequence.to_der
       if fields['d'].is_a?(String)
         ec.private_key = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2)
       end

@@ -6,6 +6,7 @@ platforms :ruby do
     gem 'pry-doc'
     # gem 'redcarpet'
     gem 'yard'
+    gem 'openssl', '~> 3.1'
   end
 end
 
