@@ -14,16 +14,31 @@ class JOSE::JWK::KTY_EC < Struct.new(:key)
       else
         raise ArgumentError, "invalid 'EC' JWK"
       end
-      ec = OpenSSL::PKey::EC.new(crv)
+
       x = JOSE.urlsafe_decode64(fields['x'])
       y = JOSE.urlsafe_decode64(fields['y'])
-      ec.public_key = OpenSSL::PKey::EC::Point.new(
+      point    = OpenSSL::PKey::EC::Point.new(
         OpenSSL::PKey::EC::Group.new(crv),
         OpenSSL::BN.new([0x04, x, y].pack('Ca*a*'), 2)
       )
-      if fields['d'].is_a?(String)
-        ec.private_key = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2)
+
+      sequence = if fields['d'].is_a?(String)
+        OpenSSL::ASN1::Sequence([
+          OpenSSL::ASN1::Integer(1),
+          OpenSSL::ASN1::OctetString(OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2).to_s(2)),
+          OpenSSL::ASN1::ObjectId(crv, 0, :EXPLICIT),
+          OpenSSL::ASN1::BitString(point.to_octet_string(:uncompressed), 1, :EXPLICIT)
+        ])
+      else
+        OpenSSL::ASN1::Sequence([
+          OpenSSL::ASN1::Sequence([
+            OpenSSL::ASN1::ObjectId("id-ecPublicKey"),
+            OpenSSL::ASN1::ObjectId(crv)
+          ]),
+          OpenSSL::ASN1::BitString(point.to_octet_string(:uncompressed))
+        ])
       end
+      ec = OpenSSL::PKey::EC.new(sequence.to_der)
       return JOSE::JWK::KTY_EC.new(JOSE::JWK::PKeyProxy.new(ec)), fields.except('kty', 'crv', 'd', 'x', 'y')
     else
       raise ArgumentError, "invalid 'EC' JWK"
@@ -132,7 +147,7 @@ class JOSE::JWK::KTY_EC < Struct.new(:key)
       curve_name
     end
     if curve_name.is_a?(String)
-      return from_key(OpenSSL::PKey::EC.new(curve_name).generate_key)
+      return from_key(OpenSSL::PKey::EC.generate(curve_name))
     else
       raise ArgumentError, "'curve_name' must be a String"
     end

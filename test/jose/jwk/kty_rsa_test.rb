@@ -23,8 +23,8 @@ class JOSE::JWK::KTY_RSATest < Minitest::Test
   end
 
   def test_generate_key
-    jwk1 = JOSE::JWK.generate_key([:rsa, 128])
-    jwk2 = JOSE::JWK.generate_key([:rsa, 128, 13])
+    jwk1 = JOSE::JWK.generate_key([:rsa, 1024])
+    jwk2 = JOSE::JWK.generate_key([:rsa, 1024, 13])
     jwk3 = JOSE::JWK.generate_key(jwk2)
     refute_equal JOSE::JWK.thumbprint(jwk1), JOSE::JWK.thumbprint(jwk2)
     refute_equal JOSE::JWK.thumbprint(jwk1), JOSE::JWK.thumbprint(jwk3)

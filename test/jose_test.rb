@@ -419,9 +419,10 @@ class JOSETest < Minitest::Test
     assert_equal v_5_9_2_cek, JOSE.urlsafe_encode64(JOSE::JWE::ALG_AES_KW.new(128).key_decrypt(v_5_9_1_jwk, nil, JOSE.urlsafe_decode64(v_5_9_3_encrypted_key)))
     # 5.9.4
     v_5_9_4_jwe = JOSE::JWE.from_binary(figures[166])
-    v_5_9_4_jwe_protected = figures[167]
-    v_5_9_4_cipher_text = figures[168]
-    v_5_9_4_cipher_tag = figures[169]
+    # commenting out unused variables because they are helpful as documentation
+    # v_5_9_4_jwe_protected = figures[167]
+    # v_5_9_4_cipher_text = figures[168]
+    # v_5_9_4_cipher_tag = figures[169]
     v_5_9_5_jwe_compact = figures[170]
     v_5_9_5_jwe_map = JOSE.decode(figures[172])
     plain_text, jwe = JOSE::JWE.block_decrypt(v_5_9_1_jwk, v_5_9_5_jwe_compact)

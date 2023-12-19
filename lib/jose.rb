@@ -1,7 +1,7 @@
 require 'jose/version'
 
 require 'base64'
-require 'hamster/hash'
+require 'immutable/hash'
 require 'json'
 require 'openssl'
 require 'securerandom'
@@ -28,8 +28,8 @@ module JOSE
   # @!visibility private
   MUTEX = Mutex.new
 
-  # Immutable Map structure based on `Hamster::Hash`.
-  class Map < Hamster::Hash; end
+  # Immutable Map structure based on `Immutable::Hash`.
+  class Map < Immutable::Hash; end
 
   @__crypto_fallback__ = ENV['JOSE_CRYPTO_FALLBACK'] ? true : false
   @__unsecured_signing__ = ENV['JOSE_UNSECURED_SIGNING'] ? true : false
