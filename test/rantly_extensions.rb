@@ -1,5 +1,18 @@
-require 'rantly/minitest_extensions'
+require 'minitest'
+require 'rantly/property'
 require 'rantly/shrinks'
+
+test_class = if defined?(Minitest::Test)
+  Minitest::Test
+else
+  Minitest::Unit::TestCase
+end
+
+test_class.class_eval do
+  def property_of(&blk)
+    Rantly::Property.new(blk)
+  end
+end
 
 class Rantly
 
