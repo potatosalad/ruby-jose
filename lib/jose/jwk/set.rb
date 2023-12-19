@@ -1,7 +1,7 @@
-require 'hamster/vector'
+require 'immutable/vector'
 
-# Immutable Set structure based on `Hamster::Vector`.
-class JOSE::JWK::Set < Hamster::Vector
+# Immutable Set structure based on `Immutable::Vector`.
+class JOSE::JWK::Set < Immutable::Vector
 
   def self.from_map(fields)
     if fields['keys'].is_a?(Array)
