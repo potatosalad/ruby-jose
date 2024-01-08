@@ -59,7 +59,7 @@ module JOSE::JWA::PKCS1
     if hash.is_a?(String)
       hash = OpenSSL::Digest.new(hash)
     end
-    salt ||= -2
+    salt ||= -1
     if salt.is_a?(Integer)
       salt_len = salt
       if salt_len == -2
@@ -102,7 +102,7 @@ module JOSE::JWA::PKCS1
     if hash.is_a?(String)
       hash = OpenSSL::Digest.new(hash)
     end
-    salt_len ||= -2
+    salt_len ||= -1
     if salt_len == -2
       hash_len = hash.digest('').bytesize
       em_len = (em_bits / 8.0).ceil

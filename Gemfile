@@ -19,10 +19,10 @@ group :test do
   gem "x25519"
   gem 'minitest-focus', require: false
   gem 'minitest-perf', require: false
-  gem 'rantly', github: 'abargnesi/rantly', ref: '8ba1d908659c1cf2a08487b2a4e758a6197a0802', require: false
+  gem 'rantly', github: 'rantly-rb/rantly', ref: '9ea88a43d6437db76a0b5341a3c41c2687e18cd8', require: false
   gem 'simplecov', require: false
   if ENV['CI']
-    gem 'coveralls', require: false
+    gem 'codecov', require: false
   end
 end
 

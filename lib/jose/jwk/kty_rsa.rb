@@ -157,7 +157,12 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
     when :rsa_pkcs1_padding
       return key.sign(digest_type.new, message)
     when :rsa_pkcs1_pss_padding
-      return JOSE::JWA::PKCS1.rsassa_pss_sign(digest_type, message, key)
+      if key.respond_to?(:sign_pss)
+        digest_name = digest_type.new.name
+        return key.sign_pss(digest_name, message, salt_length: :digest, mgf1_hash: digest_name)
+      else
+        return JOSE::JWA::PKCS1.rsassa_pss_sign(digest_type, message, key)
+      end
     else
       raise ArgumentError, "unsupported RSA padding: #{padding.inspect}"
     end
@@ -186,7 +191,12 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
     when :rsa_pkcs1_padding
       return key.verify(digest_type.new, signature, message)
     when :rsa_pkcs1_pss_padding
-      return JOSE::JWA::PKCS1.rsassa_pss_verify(digest_type, message, signature, key)
+      if key.respond_to?(:verify_pss)
+        digest_name = digest_type.new.name
+        return key.verify_pss(digest_name, signature, message, salt_length: :digest, mgf1_hash: digest_name)
+      else
+        return JOSE::JWA::PKCS1.rsassa_pss_verify(digest_type, message, signature, key)
+      end
     else
       raise ArgumentError, "unsupported RSA padding: #{padding.inspect}"
     end

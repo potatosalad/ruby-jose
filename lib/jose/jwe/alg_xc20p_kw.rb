@@ -1,4 +1,4 @@
-class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
+class JOSE::JWE::ALG_XC20P_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
 
   # JOSE::JWE callbacks
 
@@ -6,15 +6,9 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
     bits = nil
     cipher_name = nil
     case fields['alg']
-    when 'A128GCMKW'
-      bits = 128
-      cipher_name = 'aes-128-gcm'
-    when 'A192GCMKW'
-      bits = 192
-      cipher_name = 'aes-192-gcm'
-    when 'A256GCMKW'
+    when 'XC20PKW'
       bits = 256
-      cipher_name = 'aes-256-gcm'
+      cipher_name = 'xchacha20-poly1305'
     else
       raise ArgumentError, "invalid 'alg' for JWE: #{fields['alg'].inspect}"
     end
@@ -58,14 +52,7 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
     aad = ''
     cipher_text = encrypted_key
     cipher_tag = tag
-    cipher = OpenSSL::Cipher.new(cipher_name)
-    cipher.decrypt
-    cipher.key = derived_key
-    cipher.iv = iv
-    cipher.padding = 0
-    cipher.auth_data = aad
-    cipher.auth_tag = cipher_tag
-    plain_text = cipher.update(cipher_text) + cipher.final
+    plain_text = JOSE.xchacha20poly1305_module().xchacha20poly1305_aead_decrypt(derived_key, iv, aad, cipher_text, cipher_tag)
     return plain_text
   end
 
@@ -73,18 +60,11 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
     if key.is_a?(JOSE::JWK)
       key = key.kty.derive_key
     end
-    new_alg = JOSE::JWE::ALG_AES_GCM_KW.new(cipher_name, bits, iv || SecureRandom.random_bytes(12))
+    new_alg = JOSE::JWE::ALG_XC20P_KW.new(cipher_name, bits, iv || SecureRandom.random_bytes(24))
     derived_key = key
     aad = ''
     plain_text = decrypted_key
-    cipher = OpenSSL::Cipher.new(new_alg.cipher_name)
-    cipher.encrypt
-    cipher.key = derived_key
-    cipher.iv = new_alg.iv
-    cipher.padding = 0
-    cipher.auth_data = aad
-    cipher_text = cipher.update(plain_text) + cipher.final
-    new_alg.tag = cipher.auth_tag
+    cipher_text, new_alg.tag = JOSE.xchacha20poly1305_module().xchacha20poly1305_aead_encrypt(key, new_alg.iv, aad, plain_text)
     return cipher_text, new_alg
   end
 
@@ -96,14 +76,10 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
 
   def algorithm
     case bits
-    when 128
-      'A128GCMKW'
-    when 192
-      'A192GCMKW'
     when 256
-      'A256GCMKW'
+      'XC20PKW'
     else
-      raise ArgumentError, "unhandled JOSE::JWE::ALG_AES_GCM_KW bits: #{bits.inspect}"
+      raise ArgumentError, "unhandled JOSE::JWE::ALG_XC20P_KW bits: #{bits.inspect}"
     end
   end
 

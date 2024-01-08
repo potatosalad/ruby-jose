@@ -127,7 +127,9 @@ module JOSE
         'A256GCM',
         'A128CBC-HS256',
         'A192CBC-HS384',
-        'A256CBC-HS512'
+        'A256CBC-HS512',
+        'C20P',
+        'XC20P'
       ])
       jwe_alg = __jwe_alg_support_check__([
         ['A128GCMKW', :block],
@@ -136,6 +138,7 @@ module JOSE
         ['A128KW', :block],
         ['A192KW', :block],
         ['A256KW', :block],
+        ['C20PKW', :block],
         ['ECDH-ES', :box],
         ['ECDH-ES+A128KW', :box],
         ['ECDH-ES+A192KW', :box],
@@ -146,6 +149,7 @@ module JOSE
         ['RSA1_5', :rsa],
         ['RSA-OAEP', :rsa],
         ['RSA-OAEP-256', :rsa],
+        ['XC20PKW', :block],
         ['dir', :direct]
       ], jwe_enc)
       jwe_zip = __jwe_zip_support_check__([
@@ -231,7 +235,7 @@ module JOSE
             cipher_text = recv_jwk.box_encrypt(plain_text, send_jwk).compact
             next recv_jwk.box_decrypt(cipher_text).first == plain_text
           elsif strategy == :rsa
-            rsa ||= JOSE::JWK.generate_key([:rsa, 1024])
+            rsa ||= JOSE::JWK.generate_key([:rsa, 2048])
             cipher_text = rsa.block_encrypt(plain_text, { 'alg' => alg, 'enc' => enc }).compact
             next rsa.block_decrypt(cipher_text).first == plain_text
           elsif strategy == :direct
@@ -314,7 +318,7 @@ module JOSE
         begin
           jwk = nil
           jwk ||= JOSE::JWK.generate_key([:oct, 0]).merge({ 'alg' => alg, 'use' => 'sig' }) if alg == 'none'
-          jwk ||= (rsa ||= JOSE::JWK.generate_key([:rsa, 1024])).merge({ 'alg' => alg, 'use' => 'sig' }) if alg.start_with?('RS') or alg.start_with?('PS')
+          jwk ||= (rsa ||= JOSE::JWK.generate_key([:rsa, 2048])).merge({ 'alg' => alg, 'use' => 'sig' }) if alg.start_with?('RS') or alg.start_with?('PS')
           jwk ||= JOSE::JWS.generate_key({ 'alg' => alg })
           signed_text = jwk.sign(plain_text).compact
           next jwk.verify_strict(signed_text, [alg]).first
@@ -337,3 +341,4 @@ require 'jose/jwa/curve25519'
 require 'jose/jwa/curve448'
 require 'jose/jwa/pkcs1'
 require 'jose/jwa/pkcs7'
+require 'jose/jwa/xchacha20poly1305'

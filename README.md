@@ -1,6 +1,6 @@
 # JOSE
 
-[![Travis](https://img.shields.io/travis/potatosalad/ruby-jose.svg?maxAge=86400)](https://travis-ci.org/potatosalad/ruby-jose) [![Coverage Status](https://coveralls.io/repos/github/potatosalad/ruby-jose/badge.svg?branch=master)](https://coveralls.io/github/potatosalad/ruby-jose?branch=master) [![Gem](https://img.shields.io/gem/v/jose.svg?maxAge=86400)](https://rubygems.org/gems/jose) [![Docs](https://img.shields.io/badge/yard-docs-blue.svg?maxAge=86400)](http://www.rubydoc.info/gems/jose) [![Inline docs](http://inch-ci.org/github/potatosalad/ruby-jose.svg?branch=master&style=shields)](http://inch-ci.org/github/potatosalad/ruby-jose)
+[![CI](https://github.com/potatosalad/ruby-jose/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/potatosalad/ruby-jose/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/potatosalad/ruby-jose/branch/master/graph/badge.svg)](https://codecov.io/gh/potatosalad/ruby-jose) [![Gem](https://img.shields.io/gem/v/jose.svg?maxAge=86400)](https://rubygems.org/gems/jose) [![Docs](https://img.shields.io/badge/yard-docs-blue.svg?maxAge=86400)](http://www.rubydoc.info/gems/jose) [![Inline docs](http://inch-ci.org/github/potatosalad/ruby-jose.svg?branch=master&style=shields)](http://inch-ci.org/github/potatosalad/ruby-jose)
 
 JSON Object Signing and Encryption (JOSE) for Ruby.
 
@@ -65,4 +65,4 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/potato
 
 ## License
 
-The gem is available as open source under the terms of the [MPL-2.0 License](http://opensource.org/licenses/MPL-2.0).
+The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).

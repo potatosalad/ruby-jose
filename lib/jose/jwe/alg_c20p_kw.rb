@@ -1,4 +1,4 @@
-class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
+class JOSE::JWE::ALG_C20P_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
 
   # JOSE::JWE callbacks
 
@@ -6,15 +6,9 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
     bits = nil
     cipher_name = nil
     case fields['alg']
-    when 'A128GCMKW'
-      bits = 128
-      cipher_name = 'aes-128-gcm'
-    when 'A192GCMKW'
-      bits = 192
-      cipher_name = 'aes-192-gcm'
-    when 'A256GCMKW'
+    when 'C20PKW'
       bits = 256
-      cipher_name = 'aes-256-gcm'
+      cipher_name = 'chacha20-poly1305'
     else
       raise ArgumentError, "invalid 'alg' for JWE: #{fields['alg'].inspect}"
     end
@@ -73,7 +67,7 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
     if key.is_a?(JOSE::JWK)
       key = key.kty.derive_key
     end
-    new_alg = JOSE::JWE::ALG_AES_GCM_KW.new(cipher_name, bits, iv || SecureRandom.random_bytes(12))
+    new_alg = JOSE::JWE::ALG_C20P_KW.new(cipher_name, bits, iv || SecureRandom.random_bytes(12))
     derived_key = key
     aad = ''
     plain_text = decrypted_key
@@ -96,14 +90,10 @@ class JOSE::JWE::ALG_AES_GCM_KW < Struct.new(:cipher_name, :bits, :iv, :tag)
 
   def algorithm
     case bits
-    when 128
-      'A128GCMKW'
-    when 192
-      'A192GCMKW'
     when 256
-      'A256GCMKW'
+      'C20PKW'
     else
-      raise ArgumentError, "unhandled JOSE::JWE::ALG_AES_GCM_KW bits: #{bits.inspect}"
+      raise ArgumentError, "unhandled JOSE::JWE::ALG_C20P_KW bits: #{bits.inspect}"
     end
   end
 

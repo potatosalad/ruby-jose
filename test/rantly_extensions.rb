@@ -27,6 +27,9 @@ class Rantly
       'A192KW',
       'A256KW'
     ],
+    :c20pkw => [
+      'C20PKW'
+    ],
     :direct => [
       'dir'
     ],
@@ -45,6 +48,9 @@ class Rantly
       'RSA1_5',
       'RSA-OAEP',
       'RSA-OAEP-256'
+    ],
+    :xc20pkw => [
+      'XC20PKW'
     ]
   }.freeze
 
@@ -73,6 +79,12 @@ class Rantly
       'A128GCM',
       'A192GCM',
       'A256GCM'
+    ],
+    :c20p => [
+      'C20P'
+    ],
+    :xc20p => [
+      'XC20P'
     ]
   }.freeze
 

@@ -1076,6 +1076,8 @@ module JOSE
           JOSE::JWE::ALG_AES_KW
         when 'A128GCMKW', 'A192GCMKW', 'A256GCMKW'
           JOSE::JWE::ALG_AES_GCM_KW
+        when 'C20PKW'
+          JOSE::JWE::ALG_C20P_KW
         when 'dir'
           JOSE::JWE::ALG_dir
         when 'ECDH-ES', 'ECDH-ES+A128KW', 'ECDH-ES+A192KW', 'ECDH-ES+A256KW'
@@ -1084,6 +1086,8 @@ module JOSE
           JOSE::JWE::ALG_PBES2
         when 'RSA1_5', 'RSA-OAEP', 'RSA-OAEP-256'
           JOSE::JWE::ALG_RSA
+        when 'XC20PKW'
+          JOSE::JWE::ALG_XC20P_KW
         else
           raise ArgumentError, "unknown 'alg': #{jwe.fields['alg'].inspect}"
         end
@@ -1095,6 +1099,10 @@ module JOSE
           JOSE::JWE::ENC_AES_CBC_HMAC
         when 'A128GCM', 'A192GCM', 'A256GCM'
           JOSE::JWE::ENC_AES_GCM
+        when 'C20P'
+          JOSE::JWE::ENC_C20P
+        when 'XC20P'
+          JOSE::JWE::ENC_XC20P
         else
           raise ArgumentError, "unknown 'enc': #{jwe.fields['enc'].inspect}"
         end

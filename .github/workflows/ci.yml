@@ -3,7 +3,8 @@ name: CI
 on: [push, pull_request]
 
 env:
-  JOSE_CRYPTO_FALLBACK: "true"
+  COVERAGE: true
+  JOSE_CRYPTO_FALLBACK: true
   RUBYOPT: "-W0"
 
 jobs:

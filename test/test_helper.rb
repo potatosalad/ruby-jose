@@ -1,13 +1,12 @@
 require 'pry'
 
-if ENV['CI']
-  require 'coveralls'
-  Coveralls.wear!
-end
-
 if ENV['COVERAGE']
   require 'simplecov'
   SimpleCov.start
+  if ENV['CI']
+    require 'codecov'
+    SimpleCov.formatter = SimpleCov::Formatter::Codecov
+  end
 end
 
 require 'tempfile'

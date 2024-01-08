@@ -26,7 +26,24 @@ module JOSE::JWA::Ed25519_RbNaCl
   end
 
   def verify(sig, m, pk)
-    return RbNaCl::Signatures::Ed25519::VerifyKey.new(pk).verify(sig, m)
+    verify_key = RbNaCl::Signatures::Ed25519::VerifyKey.new(pk)
+    if m.respond_to?(:bytesize) and m.bytesize == 0
+      # RbNaCl does not allow empty message signatures.
+      key = verify_key.instance_variable_get(:@key)
+      signature = sig.to_str
+      signature_bytes = verify_key.signature_bytes
+      RbNaCl::Util.check_length(signature, signature_bytes, "signature")
+      signed_message = signature + m
+      raise RbNaCl::LengthError, "Signed message can not be nil" if signed_message.nil?
+      raise RbNaCl::LengthError, "Signed message can not be shorter than a signature" if signed_message.bytesize < signature_bytes
+      buffer = RbNaCl::Util.zeros(signed_message.bytesize)
+      buffer_len = RbNaCl::Util.zeros(FFI::Type::LONG_LONG.size)
+      success = verify_key.class.sign_ed25519_open(buffer, buffer_len, signed_message, signed_message.bytesize, key)
+      raise(RbNaCl::BadSignatureError, "signature was forged/corrupt") unless success
+      return true
+    else
+      return verify_key.verify(sig, m)
+    end
   end
 
   def verify_ph(sig, m, pk)
