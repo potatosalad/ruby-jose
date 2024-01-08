@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0 (2024-01-08)
+
+* Enhancements
+  * Add support for C20P and C20PKW (see [61fb00b](https://github.com/potatosalad/ruby-jose/commit/61fb00b1576225653851fbcb97289306270a14ef) and [2f38f78](https://github.com/potatosalad/ruby-jose/commit/2f38f78996f354b463e8b1208161e9bb7a69437b)).
+  * Add support for XC20P and XC20PKW (see [29d0942](https://github.com/potatosalad/ruby-jose/commit/29d09424de720f69050b5f13d3476cb75968c4c5)).
+  * Relicense library under MIT license (thanks to [@jessieay](https://github.com/jessieay) in [#14](https://github.com/potatosalad/ruby-jose/pull/14)).
+
+* Fixes
+  * Use RSA PSS salt length of hash/digest length instead of max length (thanks to [@abhiuppala](https://github.com/abhiuppala) for reporting in [#12](https://github.com/potatosalad/ruby-jose/issues/12), see [646bdde](https://github.com/potatosalad/ruby-jose/commit/646bdde5a8f7b551056e063a5590c1e822a74b75))
+  * Full Ruby 3 and OpenSSL 3 compatibility (thanks to [@beanieboi](https://github.com/beanieboi), see [#25](https://github.com/potatosalad/ruby-jose/pull/25)).
+
 ## 1.1.3 (2018-09-20)
 
 * Enhancements
