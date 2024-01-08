@@ -7,10 +7,6 @@ module JOSE::JWA::Curve25519_RbNaCl
   def __supported__?
     return @supported ||= begin
       begin
-        require 'rbnacl/libsodium'
-      rescue LoadError
-      end
-      begin
         require 'rbnacl'
       rescue LoadError
       end

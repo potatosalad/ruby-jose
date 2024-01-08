@@ -290,7 +290,7 @@ module JOSE
           kty.push(key_type) if not kty_OKP_crv.empty?
         when 'RSA'
           begin
-            JOSE::JWK.generate_key([:rsa, 256])
+            JOSE::JWK.generate_key([:rsa, 1024])
             kty.push(key_type)
           rescue StandardError, NotImplementedError
             # do nothing

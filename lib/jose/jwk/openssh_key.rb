@@ -190,7 +190,6 @@ private
 
   def parse_publickeys(body, n, pks = [])
     return pks, body if n == 0
-    pos = body.pos
     if pk_len = body.read(4) and pk_len.bytesize == 4
       pk_len, = pk_len.unpack('N')
       if pk = body.read(pk_len) and pk.bytesize == pk_len

@@ -8,36 +8,32 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
         raise ArgumentError, "multi-prime RSA keys are not supported"
       elsif fields['d'].is_a?(String)
         if fields['dp'].is_a?(String) and fields['dq'].is_a?(String) and fields['p'].is_a?(String) and fields['q'].is_a?(String) and fields['qi'].is_a?(String)
-          rsa      = OpenSSL::PKey::RSA.new
-          rsa.set_key(
-            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['n']), 2),
-            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['e']), 2),
-            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2)
-          )
-          rsa.set_factors(
-            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['p']), 2),
-            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['q']), 2)
-          )
-          rsa.set_crt_params(
-            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['dp']), 2),
-            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['dq']), 2),
-            OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['qi']), 2)
-          )
+          asn1_sequence = OpenSSL::ASN1::Sequence.new([
+            OpenSSL::ASN1::Integer.new(0),
+            OpenSSL::ASN1::Integer.new(OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['n']), 2)),
+            OpenSSL::ASN1::Integer.new(OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['e']), 2)),
+            OpenSSL::ASN1::Integer.new(OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2)),
+            OpenSSL::ASN1::Integer.new(OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['p']), 2)),
+            OpenSSL::ASN1::Integer.new(OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['q']), 2)),
+            OpenSSL::ASN1::Integer.new(OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['dp']), 2)),
+            OpenSSL::ASN1::Integer.new(OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['dq']), 2)),
+            OpenSSL::ASN1::Integer.new(OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['qi']), 2))
+          ])
+          rsa = OpenSSL::PKey::RSA.new(asn1_sequence.to_der)
           return JOSE::JWK::KTY_RSA.new(JOSE::JWK::PKeyProxy.new(rsa)), fields.except('kty', 'd', 'dp', 'dq', 'e', 'n', 'p', 'q', 'qi')
         else
-          d   = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2)
-          e   = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['e']), 2)
-          n   = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['n']), 2)
+          d = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['d']), 2)
+          e = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['e']), 2)
+          n = OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['n']), 2)
           rsa = convert_sfm_to_crt(d, e, n)
           return JOSE::JWK::KTY_RSA.new(JOSE::JWK::PKeyProxy.new(rsa)), fields.except('kty', 'd', 'dp', 'dq', 'e', 'n', 'p', 'q', 'qi')
         end
       else
-        rsa   = OpenSSL::PKey::RSA.new
-        rsa.set_key(
-          OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['n']), 2),
-          OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['e']), 2),
-          nil
-        )
+        asn1_sequence = OpenSSL::ASN1::Sequence.new([
+          OpenSSL::ASN1::Integer.new(OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['n']), 2)),
+          OpenSSL::ASN1::Integer.new(OpenSSL::BN.new(JOSE.urlsafe_decode64(fields['e']), 2))
+        ])
+        rsa = OpenSSL::PKey::RSA.new(OpenSSL::PKey::RSA.new(asn1_sequence.to_der))
         return JOSE::JWK::KTY_RSA.new(JOSE::JWK::PKeyProxy.new(rsa)), fields.except('kty', 'e', 'n')
       end
     else
@@ -140,7 +136,8 @@ class JOSE::JWK::KTY_RSA < Struct.new(:key)
       end
     end
     if modulus_size.is_a?(Integer) and (exponent_size.nil? or exponent_size.is_a?(Integer))
-      return from_key(OpenSSL::PKey::RSA.generate(modulus_size, exponent_size))
+      return from_key(OpenSSL::PKey::RSA.generate(modulus_size)) if exponent_size.nil?
+      return from_key(OpenSSL::PKey::RSA.generate(modulus_size, exponent_size)) if exponent_size.is_a?(Integer)
     else
       raise ArgumentError, "'modulus_size' must be an Integer and 'exponent_size' must be nil or an Integer"
     end
@@ -230,11 +227,18 @@ private
     dq = d % (q - 1)
     qi = q.mod_inverse(p)
 
-    rsa = OpenSSL::PKey::RSA.new
-    rsa.set_key(n, e, d)
-    rsa.set_factors(p, q)
-    rsa.set_crt_params(dp, dq, qi)
-
+    asn1_sequence = OpenSSL::ASN1::Sequence.new([
+      OpenSSL::ASN1::Integer.new(0),
+      OpenSSL::ASN1::Integer.new(n),
+      OpenSSL::ASN1::Integer.new(e),
+      OpenSSL::ASN1::Integer.new(d),
+      OpenSSL::ASN1::Integer.new(p),
+      OpenSSL::ASN1::Integer.new(q),
+      OpenSSL::ASN1::Integer.new(dp),
+      OpenSSL::ASN1::Integer.new(dq),
+      OpenSSL::ASN1::Integer.new(qi)
+    ])
+    rsa = OpenSSL::PKey::RSA.new(asn1_sequence.to_der)
     return rsa
   end
 

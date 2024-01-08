@@ -481,7 +481,7 @@ module JOSE
     # Converts a private {JOSE::JWK JOSE::JWK} into a public {JOSE::JWK JOSE::JWK}.
     #
     #     !!!ruby
-    #     jwk_rsa = JOSE::JWK.generate_key([:rsa, 256]).to_map
+    #     jwk_rsa = JOSE::JWK.generate_key([:rsa, 1024]).to_map
     #     # => JOSE::Map[
     #     #  "dq" => "Iv_BghpjRyv8hk4AgsX_3w",
     #     #  "e" => "AQAB",

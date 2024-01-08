@@ -11,12 +11,16 @@ class CFRGCurvesTest < Minitest::Test
         hexstr2bin(
           "d75a980182b10ab7d54bfed3c964073a"\
           "0ee172f3daa62325af021a68f707511a"), # PUBLIC KEY
-        "", # MESSAGE
         hexstr2bin(
-          "e5564300c360ac729086e2cc806e828a"\
-          "84877f1eb8e5d974d873e06522490155"\
-          "5fb8821590a33bacc61e39701cf9b46b"\
-          "d25bf5f0595bbe24655141438e7a100b") # SIGNATURE
+          "1b79abc415a34efe5915b4c1b53d2435"\
+          "e731b3c92d0ba440de29cab2999fa885"\
+          "bd0eb3c71dfd8df6fbecf8c0ef403e89"\
+          "02dec8e2abd00a2bb9b04b1df027929609"), # MESSAGE
+        hexstr2bin(
+          "c2ace0031e4c62e758872427e1bca3df"\
+          "683339792a2c18c4547190678152e91c"\
+          "9be04f5704acf5c2e61d835e8a53b49d"\
+          "83e27879f26024afc7320e94c7d84a07") # SIGNATURE
       ],
       [ # TEST 2
         hexstr2bin(
